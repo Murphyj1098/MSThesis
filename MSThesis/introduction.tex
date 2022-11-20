@@ -1,5 +1,35 @@
 \chapter{Introduction}
 \label{ch:introduction}
+\section{Motivation}
+As the need Internet and wireless communications grow, more solutions for deploying networks are being conceived. 
+Networks are expensive to deploy and test, especially in rural conditions and when using special networks (MANET) % Statistics on expensive network deployment (especially for testing and research)
+This creates a need for a low-cost, easy method to do initial testing on networks and network technologies to validate viability before spending money on hardware deployments and testing
+Use network simulation and emulation for preliminary testing as it can require little to no hardware, can be conducted in a lab, and costs less than building physical networks for each new experiment
 
+\section{State of the Art}
+Many different software and combination software-hardware platforms exist for testing networks.
+ns-3, NetSim, OPNET (now called Riverbed)
+% What do these tools excel at?
 
+\section{Current Issues}
+Why are these simulators not as good?
+\begin{itemize}
+    \item Many are not free or open-source (expensive to use and possibly not as customizable) % NetSim, OPNET
+    \item Can be complex to set up % NS-3 is not GUI based, instead requires knowledge of C++ or Python
+    \item Often only focus on network layer and abstract MAC/PHY layer, OR model the MAC/PHY layer but does not allow for integration with network software and protocols
+\end{itemize}
 
+\section{Thesis Contribution}
+\begin{itemize}
+    \item Propose EMANE as valuable tool that addresses issues with other tools, explain how to install it, and explain how it works
+    \item Develop an initial simple program for maximizing bandwidth in constrained networks % Something to do with OVERCOME (the intelligent router?)
+    \item Basic integration between the robot swarm simulator, ARGoS, and EMANE allowing for more complicated and complete communications simulation
+\end{itemize}
+
+\section{Thesis Organization}
+The remainder of this thesis is organized as follows:
+In Chapter 2, an overview of the network emulator EMANE is presented and the motivation for why this tool was selected is explained. An overview of the subsystems used in EMANE and how to use them is included.
+Chapter 3 proposes the first use case for testing with EMANE, testing rural broadband deployments. Two similar network topologies are proposed and tested with the help of EMANE.
+Chapter 4 explores a second use case for utilizing EMANE, development of networking technologies and systems. In this case a program for more intelligent allocated limited bandwidth is developed.
+Chapter 5 finally details a third use case for EMANE, integrating with other simulation tools to provide more accurate communication models.
+The paper is concluded with a summary of work completed and recommendations for future work in Chapter 6.

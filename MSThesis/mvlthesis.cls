@@ -269,6 +269,9 @@ Wednesday\or Thursday\or Friday\or Saturday\fi}
 % Member #3
 \def\memberthree#1{\gdef\@memberthree{#1}}
 
+% Member #4
+\def\memberfour#1{\gdef\@memberfour{#1}}
+
 % \alwayssingle and \endalwayssingle
 %
 % These macros define an environment for front matter that is always
@@ -327,6 +330,9 @@ Wednesday\or Thursday\or Friday\or Saturday\fi}
     \smallskip
     \rule[-.2in]{4.75in}{0.01in}\\
     {\@memberthree}\\
+    \smallskip
+    \rule[-.2in]{4.75in}{0.01in}\\
+    {\@memberfour}\\
 }
     \vfil\null
 \end{alwayssingle}

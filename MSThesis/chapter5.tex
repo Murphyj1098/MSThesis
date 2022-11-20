@@ -1,2 +1,27 @@
-\chapter{Chapter 5 Title}
+\chapter{Robot Swarm Networks}
 \label{chapter5}
+
+    % Overview of the swarm and swarm mission
+
+\section{What was implemented?}
+    % Details of the robot swarm
+    % Introduce ARGoS
+    % Combine EMANE and ARGoS for:
+        % Better communication modeling
+        % Ability to actually use the full implementation of BATMAN
+        % Use ML to influence the swarm and network topologies
+
+\section{How was it implemented?}
+    % Two simulation/emulation programs run simultaneous on the same machines
+    % Take turns running for a time delta (default 100ms)
+    % Utilize shared system memory to pass data between processes
+
+\section{Why was it implemented this way?}
+    % Why integrate EMANE with ARGoS
+    % Why make the abstractions made
+        % Don't send actual data payload through EMANE, just inform on amount of data tx'ed
+    % Why preserve the behavior that was preserved
+        % Ensure locations are correct as it is essential for determining routes/pathloss/etc.
+
+\section {Chapter Summary}
+

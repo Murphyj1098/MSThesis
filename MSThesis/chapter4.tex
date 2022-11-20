@@ -1,2 +1,37 @@
-\chapter{Chapter Title}
+\chapter{Intelligent Router}
 \label{chapter4}
+
+    % Broadband in rural situations is limited due to reasons explained in Chapter 3
+    % Utilizes the OVERCOME test-bed from Chapter 3
+
+\section{Intelligent Method of Bandwidth Distribution}
+    % A heuristic based router that intelligently allocates bandwidth to hosts
+    % Based on the behavior of uploads and downloads
+
+\section{Implementation Methodology}
+    % Want to classify each host's current upload/download usage
+        % Use 
+    % Use this classification to create priority tiers that influence how users get more bandwidth/bandwidth taken away
+        % What is the rationale behind these priorities (study on what types of behaviors use what types of bandwidth)
+    % Create these modifications to move bandwidth caps up and down via pfSense limiters
+
+
+\section{Why was it implemented this way?}
+    % Heuristic behavior was selected over a machine learning model
+        % Why?
+    % Privacy concerns
+        % Did not want to classify based on the traffic type and what the user was doing
+        % To create a fair algorithm can not define one type of traffic as "more important"
+            % Is a Zoom call more important than a Netflix stream?
+            % Business vs. Pleasure BUT Zoom is not always business and Netflix is not always leisure
+    % Designed to be more system agnostic (tested on a pfSense Router)
+
+\section{Program Effectiveness}
+    % Only one iteration was able to be performed
+    % Not enough traffic/users on the network for meaningful data
+        % At no point during any test was total network utilization above 50%, can't take bandwidth from users to give to others if there is always a pool
+    % Ways to modify/fix the experiment and test environment to create a meaningful test
+
+
+\section {Chapter Summary}
+
