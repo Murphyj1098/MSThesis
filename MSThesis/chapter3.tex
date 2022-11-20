@@ -1,22 +1,57 @@
 \chapter{Rural Broadband}
 \label{chapter3}
 
-    % System was designed as an easily implementable, low-cost 
+    % System was designed as an easily implementable, low-cost solution for communities that are too small for a dedicated fiber backhaul, but still close enough to the fiber for a wireless solution
 
 \section{What was implemented?}
-    % Similarities in each of the two test-beds
+    % Hardware test bed utilized a mmWave backhaul and Ubiquiti LTU radios for the distribution network
+    % mmWave and LTU were abstracted using rfPipe in EMANE
+    % Allowed for testing throughput and bandwidth characteristics with multiple hosts connected as well as range using simple pathloss models
 
 \subsection{OVERCOME Test-bed}
     % Topology
+        % (FIGURE\_OVERCOMETopology)
+        % Two sets of mmWave backhauls
+        % Aggregate at a router in the middle of town
+        % Split into 3 radios for distribution to ~30 houses
+
     % Technologies used
+        % Ubiquiti AirFiber, Ubiquiti Edge Switches, Netgate pfSense Router, Ubiquiti LTU Rockets
+        % (turns into)
+        % mmWave rfPipe model, virtual bridge acting as a switch, virtualized pfSense router in VirtualBox, LTU rfPipe model
 
 \subsection{ZoomTEL Test-bed}
     % Topology
+        % (FIGURE\_ZoomTELTopology)
+        % Two-hop mmWave backhaul
+        % LTE-U distribution network at each hop
+        % Distribute to hosts centered around each hop
+
     % Technologies used
+        % Siklu EtherHaul, Ubiquiti network switches, Ubiquiti LTU Rockets
+        % (turns into_
+        % mmWave rfPipe model, virtual bridge acting as a switch, LTU rfPipe model
+
 
 \section{How was it implemented?}
     % Creating mmWave and LTU in EMANE
+        % Use rfPipe to mimic characteristics of mmWave and LTU
+            % Bandwidth, delay, throughput, frequency of interest, distance between radios, antenna RX and TX gains
+
     % Interfacing with a real pfSense router in EMANE
+        % Use EMANE transport plugins to delivery and receive real TCP/IP packets from a virtualized router
+        % Performance implications of using a virtualized router vs. the real hardware router?
+            % (No, there was such limited traffic that the hardware router was never pushed beyond a few percent usage, and the virtual router never bottlenecked)
+
+    % How were things like throughput and latency tested?
+        % In EMANE?
+            % Tools like iperf3 were used for generating traffic
+            % Test probes in EMANE were used for monitoring the "behavior" of the physical channel
+        % In the hardware test-bed?
+            % Ookla's speed test was used for collecting data through homes
+            % pfSense router monitored and recorded total data usage via the "bandwidthD" utility
+            % iftop was used (as apart of the intelligent router) and recorded average bandwidth usage during certain testing periods
+
 
 \section{Why was it implemented this way?}
     % What were the important features to capture in EMANE
@@ -24,9 +59,10 @@
         % Latency
         % Anything else?
 
+
 \section{Compare EMANE results to real test-bed?}
     % Are the measured throughputs and latencies the same IRL and in EMANE?
-    % (Do I have this data?)
+    % (Do I have this data readily available?
 
 \section {Chapter Summary}
 

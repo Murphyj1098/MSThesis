@@ -2,15 +2,20 @@
 \label{chapter4}
 
     % Broadband in rural situations is limited due to reasons explained in Chapter 3
+    % In addition to creating and testing new topologies, other methods can be used to maximize the deliverable bandwidth
+    % In this case, giving users bandwidth in an intelligent manner can allow the network to perform better
     % Utilizes the OVERCOME test-bed from Chapter 3
 
 \section{Intelligent Method of Bandwidth Distribution}
     % A heuristic based router that intelligently allocates bandwidth to hosts
     % Based on the behavior of uploads and downloads
 
+
 \section{Implementation Methodology}
+    % (FIGURE\_classify+allocate\_flowcharts)
     % Want to classify each host's current upload/download usage
-        % Use 
+        % Used tool: iftop to get average usage over 2 seconds, record usage every 6 seconds (10 times per minute)
+        % (FIGURE\_iftop)
     % Use this classification to create priority tiers that influence how users get more bandwidth/bandwidth taken away
         % What is the rationale behind these priorities (study on what types of behaviors use what types of bandwidth)
     % Create these modifications to move bandwidth caps up and down via pfSense limiters
@@ -19,15 +24,19 @@
 \section{Why was it implemented this way?}
     % Heuristic behavior was selected over a machine learning model
         % Why?
-    % Privacy concerns
+    % System privacy concerns
         % Did not want to classify based on the traffic type and what the user was doing
         % To create a fair algorithm can not define one type of traffic as "more important"
             % Is a Zoom call more important than a Netflix stream?
             % Business vs. Pleasure BUT Zoom is not always business and Netflix is not always leisure
     % Designed to be more system agnostic (tested on a pfSense Router)
+        % Utilizes pfSense-specific limiters but the idea of setting a limit is very universal
+        % Lighter weight than a ML algorithm likely would be, can be deployed closer to the last mile since it is lighter-weight
 
-\section{Program Effectiveness}
-    % Only one iteration was able to be performed
+        
+\section{Effectiveness of the Program}
+    % Only deployed for an initial iteration due to network issues
+        % No revisions made, only tested the most basic behavior
     % Not enough traffic/users on the network for meaningful data
         % At no point during any test was total network utilization above 50%, can't take bandwidth from users to give to others if there is always a pool
     % Ways to modify/fix the experiment and test environment to create a meaningful test

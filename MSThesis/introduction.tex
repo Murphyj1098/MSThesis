@@ -6,18 +6,20 @@ Networks are expensive to deploy and test, especially in rural conditions and wh
 This creates a need for a low-cost, easy method to do initial testing on networks and network technologies to validate viability before spending money on hardware deployments and testing
 Use network simulation and emulation for preliminary testing as it can require little to no hardware, can be conducted in a lab, and costs less than building physical networks for each new experiment
 
+
 \section{State of the Art}
 Many different software and combination software-hardware platforms exist for testing networks.
 ns-3, NetSim, OPNET (now called Riverbed)
-% What do these tools excel at?
+
 
 \section{Current Issues}
 Why are these simulators not as good?
 \begin{itemize}
-    \item Many are not free or open-source (expensive to use and possibly not as customizable) % NetSim, OPNET
-    \item Can be complex to set up % NS-3 is not GUI based, instead requires knowledge of C++ or Python
-    \item Often only focus on network layer and abstract MAC/PHY layer, OR model the MAC/PHY layer but does not allow for integration with network software and protocols
+    \item Many are not free or open-source (expensive to use and possibly not as customizable) % NetSim, OPNET both require payment
+    \item Can be complex to set up % NS-3 is not GUI based, instead requires knowledge of C++ or Python; EMANE is also not GUI based but can be paired with CORE for a GUI in simple experiments (configuration files are also just XML)
+    \item Often only focus on network layer and abstract MAC/PHY layer, OR model the MAC/PHY layer but does not allow for integration with network software and protocols % MATLAB can model physical channel parameters, but can not model the whole network
 \end{itemize}
+
 
 \section{Thesis Contribution}
 \begin{itemize}
@@ -25,6 +27,7 @@ Why are these simulators not as good?
     \item Develop an initial simple program for maximizing bandwidth in constrained networks % Something to do with OVERCOME (the intelligent router?)
     \item Basic integration between the robot swarm simulator, ARGoS, and EMANE allowing for more complicated and complete communications simulation
 \end{itemize}
+
 
 \section{Thesis Organization}
 The remainder of this thesis is organized as follows:

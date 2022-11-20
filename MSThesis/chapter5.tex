@@ -2,26 +2,49 @@
 \label{chapter5}
 
     % Overview of the swarm and swarm mission
+    % Swarm of 25 robots deployed to detect fire in an environment
+    
 
 \section{What was implemented?}
-    % Details of the robot swarm
     % Introduce ARGoS
-    % Combine EMANE and ARGoS for:
+        % The robot simulator ARGoS was used to model the behavior of the movement and sensing of robots
+        % ARGoS operates in chunks of time instead of real time and continuous like EMANE
+
+    % Why integrate EMANE with ARGoS
         % Better communication modeling
-        % Ability to actually use the full implementation of BATMAN
+            % ARGoS can perform basic communication modeling
+                % One example of implementation is check for line of sight conditions
+        % Ability to actually use the full implementation of BATMAN/other routing software
+            % Instead of coding the behavior of BATMAN (or other routing from scratch) and having to verify it is functionally the same, use EMANE to run actual BATMAN
         % Use ML to influence the swarm and network topologies
+            % Machine learning models can run in real time in each EMANE node, and can communicate with other models and nodes through the EMANE network
+            % Allows the same models to run in EMANE as would run on the physical robot
+
 
 \section{How was it implemented?}
     % Two simulation/emulation programs run simultaneous on the same machines
-    % Take turns running for a time delta (default 100ms)
-    % Utilize shared system memory to pass data between processes
+        % ARGoS and EMANE are both configured and run separately
+            % They exist as separate processes during the extent of runtime (one is not a child of the other)
+        % ARGoS opens shared memory and populates with metadata (including process ID), ARGoS then sleeps waiting for EMANE to wake it up
+            % ARGoS and EMANE use their respective programming language's provision for shared memory access
+        % EMANE waits until it can find shared memory with ARGoS PID, proceeds to set up remaining shared memory, creates internal data structures, wakes ARGoS, then sleeps
+        % ARGoS does internal processing, provides EMANE with new robot locations, info on which robots want to transmit, how much data each robot wants to transmit, wakes EMANE and sleeps
+        % EMANE updates its network nodes with the new locations, determines how much data each robot (that wants to transmit) can send, reports this information to ARGoS, wakes ARGoS, and sleeps
+        % This process then continues until ARGoS is finished with its experiment and signals EMANE to shutdown, before shutting down itself
+    % (FIGURE\_EMANE-ARGOS\_Interface)
+    
 
 \section{Why was it implemented this way?}
-    % Why integrate EMANE with ARGoS
-    % Why make the abstractions made
-        % Don't send actual data payload through EMANE, just inform on amount of data tx'ed
-    % Why preserve the behavior that was preserved
-        % Ensure locations are correct as it is essential for determining routes/pathloss/etc.
+    % Why were certain design decisions made?
+        % Shared memory
+            % Less latency than something like a socket
+            % The amount and size of data is known enough that appropriate blocks of memory can be opened
 
+        % Why abstract transmission -> (Don't send actual payload through EMANE)
+            % Sending the actual payload would require lots of additional work (each robot in ARGoS would need to deliver its payload to its corresponding node in EMANE, and then retrieve any data waiting for it)
+            % The payoff from this work was deemed not worth it as the behavior of informing each robot how much data it sent and received accomplished the same goal
+            % The payload was not being sent with a lossless protocol so the behavior of if the data arrives or not is much more important (robots would not be retransmitting)
+
+            
 \section {Chapter Summary}
 

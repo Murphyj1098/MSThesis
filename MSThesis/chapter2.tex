@@ -3,22 +3,83 @@
 
 \section{Network Simulation and Emulation}
     % General information on network emulation and simulation (?)
+Several tools exist for simulating networks and testing networking protocols and topologies.
+These tools can vary from modeling the behavior of large-scale networking protocols to modeling the physical characteristics of a single wireless channel.
 
 \subsection{Evaluation of Network Simulation Tools}
     % Why EMANE was selected over other tools
+One of the most well known, and most used network simulation tools is ns-3.
+ns-3 is a discrete-event network simulator that was developed to simulate and research wireless and IP networks.
+ns-3 is not limited to wireless and IP-based networks, as thanks to its open-source nature, many models for simulating other types of networks are also available.
+This option was inevitably not selected as the software to be used for this research as the physical technologies modeled 
+
+The Extendable Mobile Ad-hoc Network Emulator (EMANE) is a network emulation tool originally developed by the Naval Research Lab and currently maintained by AdjacentLink LLC.
+The software was developed with the intention of creating a platform that could emulate the physical and data link layers of the OSI network model.
+This focus on customizability of the physical and link layers is one of the main draws of EMANE because it allows for highly customizable models of physical channels to be used. 
+EMANE consists of several subsystems and components required to create a fully functional test-bed.
+This creates an initial steep learning curve when using the software, and despite being open-source, the online community around EMANE is rather small with very little active discussion happening about the tool.
+Despite all this, once the user forms a core understanding of the tools and systems within the software, the tool can be used to effectively and quickly create model wireless networks.
+For this reason EMANE and combined with the details of the other network simulation tools.
 
 \subsection{Using EMANE}
-    % Overview of EMANE as a tool
-        % Basic installation instructions
-        % Basic architecture overview
-        % NEMs
-        % Transports
-        % Events
+    % Basic installation instructions
+        % Install pre-complied bundle
+        % Build and install OLSR
+        % Enable BATMAN-adv and install batctl
+        % Verify programs are installed
+There are several ways EMANE can installed for use.
+The primary two methods are to install the bundle of pre-built binaries provided by AdjacentLink or build the tools from source.
+The precompiled bundle is sufficient for the work completed in this thesis. Compiling the software from source is typically only necessary when 
+        
+    % Basic architecture overview
+    % NEMs
+        % Each NEM should exist on its own platform server inside its own LXC
+            % EMANE recommends not putting multiple NEMs on one platform server for performance reasons
+            % Each platform server (running instance of EMANE) needs to have network stack isolation (accomplished via LXCs, but other methods exist)
+        % Each NEM has 3 layers, PHY layer, Radio layer, and transport layer
+        % Each NEM also interfaces with the event engine to ensure proper configuration and processing
+
+As previously mentioned, there are several systems that make up EMANE.
+The main three subsystems of note are the emulation processing system, the emulation transport boundary processing system, and the event processing system.
+
+    % Emulation Model Processing
+        % Shared PHY model
+            % Pathloss, fading, noise, pulling packets of OTA channel, power calculations
+        % Radio model
+            % Data bandwidth, delay, more advance medium access control schemes, SINR packet drop probabilities
+
+    % Transport Boundary Processing
+        % Raw transport
+            % Use physical network device as edge of emulation
+            % Allows for "black-box" style testing
+            % Can be used to interface physical networking hardware with EMANE
+        % Virtual transport
+            % Uses virtual kernel interfaces as edge of emulation
+            % Internal transports
+                % For NEMS on the same platform server, packets are not even sent through kernel devices, just shared with each other in memory
+            % External transports
+                % NEMs on different platforms servers must share data through the kernel (since they will have network stack isolation)
+
+    % Event Processing
+        % Event channel vs. OTA channel
+            % Scripted before runtime
+                % EEL file(s)
+            % Sent during runtime
+                % Python modules
+
 
 \section{Network Resource Scheduling}
     % Concepts of scheduling theory
+        % Used to drop and queue packets selectively to ensure certain/all traffic meets performance requirements
+        %  Can be used to smooth bursty bandwidth requests
+
     % Factors to consider when scheduling bandwidth
-    % Existing methods for scheduling bandwidth
+        % What traffic types or users should be prioritized?
+        % How "fair" should the algorithm be
+            % Formal definition of fairness in scheduling
+                % Fair in packet networks can be tricky (number of packets passed vs. size of packets passed)
+            % RR vs FIFO --> Different meanings of fair
+
     
 \section{Routing in Mobile Mesh Networks}
     % What is important in routing in a ad-hoc mobile network rather than a traditional network
@@ -26,11 +87,32 @@
         % Reactive vs. Proactive
 
 \subsection{Proactive Mesh Routing}
-        % OLSR
-        % BATMAN
+        % Requires more overhead
+        % Can (keep can, not will) react more quickly to topology changes
+        % Periodically send out "discovery" packets to sense link quality/delivery topology info/etc.
+
+        % Examples:
+            % OLSR
+                % Floods network with topology info
+            % BATMAN-adv
+                % Layer two routing, node only aware of neighbors
+                % Depends on neighbors to ensure data is passed along
+
+        % BATMAN general performs better than OLSR in most conditions [cite paper]
+            
 
 \subsection{Reactive Routing}
-        % ADOV
+        % Does not require maintenance and therefore generates less traffic
+        % Topology updates are only discovered when a previously discovered route fails
+
+        % Examples:
+            % AODV
+            % DSR
+
+        % BATMAN tends to have less available bandwidth than AODV, but more reliably delivers packets and detects topology changes faster
 
 \section {Chapter Summary}
 
+    % Chapter covered the basics of EMANE so that it may be used to set up and run experiments
+    % Network scheduling and queueing theory is important to understand the intelligent router experiment
+    % Mobile ad-hoc routing is important to understand the operation of the robot swarm experiment
