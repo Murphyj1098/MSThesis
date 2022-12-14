@@ -68,19 +68,6 @@ The main three subsystems of note are the emulation processing system, the emula
                 % Python modules
 
 
-\section{Network Resource Scheduling}
-    % Concepts of scheduling theory
-        % Used to drop and queue packets selectively to ensure certain/all traffic meets performance requirements
-        %  Can be used to smooth bursty bandwidth requests
-
-    % Factors to consider when scheduling bandwidth
-        % What traffic types or users should be prioritized?
-        % How "fair" should the algorithm be
-            % Formal definition of fairness in scheduling
-                % Fair in packet networks can be tricky (number of packets passed vs. size of packets passed)
-            % RR vs FIFO --> Different meanings of fair
-
-    
 \section{Routing in Mobile Mesh Networks}
     % What is important in routing in a ad-hoc mobile network rather than a traditional network
     % What routing algorithms exist in literature
@@ -111,8 +98,22 @@ The main three subsystems of note are the emulation processing system, the emula
 
         % BATMAN tends to have less available bandwidth than AODV, but more reliably delivers packets and detects topology changes faster
 
+\section{Network Resource Scheduling}
+    % Concepts of scheduling theory
+        % Used to drop and queue packets selectively to ensure certain/all traffic meets performance requirements
+        %  Can be used to smooth bursty bandwidth requests
+
+    % Factors to consider when scheduling bandwidth
+        % What traffic types or users should be prioritized?
+        % How "fair" should the algorithm be
+            % Formal definition of fairness in scheduling
+                % Fair in packet networks can be tricky (number of packets passed vs. size of packets passed)
+            % RR vs FIFO --> Different meanings of fair
+
+    
 \section{Chapter Summary}
 
     % Chapter covered the basics of EMANE so that it may be used to set up and run experiments
     % Network scheduling and queueing theory is important to understand the intelligent router experiment
     % Mobile ad-hoc routing is important to understand the operation of the robot swarm experiment
+    

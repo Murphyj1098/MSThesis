@@ -1,40 +1,96 @@
-\chapter{Robot Swarm Networks}
+\chapter{Dynamic Robot Swarm Networks}
 \label{chapter5}
 
-    % Overview of the swarm and swarm mission
-    % Swarm of 25 robots deployed to detect fire in an environment
+	% This is the third use-case for EMANE
+		% Combinatation use-case:
+			% Work with other software
+			% Emulate a distributed, dynamic network
+	
+	% Overview of the swarm + swarm network architecture
+		% Swarm of 25 robots deployed to make environmental observations
+		% Example deployment to wildfire (hostile area, remote)		
+		
+	% Use wireless comm links to share information with each other to:
+		% Maintain the network
+		% Share information between robots (to make better decisions)
+		% Return information back to central command
+		
+	% This network is a MANET (EMANE's specialty)
+		% Routing is key (the links connect and disconnect rapidly)
     
 
-\section{What was implemented?}
-    % Introduce ARGoS
-        % The robot simulator ARGoS was used to model the behavior of the movement and sensing of robots
-        % ARGoS operates in chunks of time instead of real time and continuous like EMANE
+\section{Extending Existing Software}
 
-    % Why integrate EMANE with ARGoS
-        % Better communication modeling
-            % ARGoS can perform basic communication modeling
-                % One example of implementation is check for line of sight conditions
-        % Ability to actually use the full implementation of BATMAN/other routing software
-            % Instead of coding the behavior of BATMAN (or other routing from scratch) and having to verify it is functionally the same, use EMANE to run actual BATMAN
-        % Use ML to influence the swarm and network topologies
+    % Introduce ARGoS
+    		% A discrete-event (?) robot swarm simulator  
+        % ARGoS models the behavior of robots in the network and the environment they operate in
+			% How they move
+			% What data they need to be transferred
+				% Based on operating algorithms
+        % ARGoS operates in chunks of time instead of real, continuous time like EMANE
+        		% Configurable, but for the purpose here ARGoS simulates 100ms at a time
+        		% Important to understand the time-scale differences
+        			% Will impact integration methodologies
+
+	% Why integrate EMANE with ARGoS?
+		% Introduce more accurate communication modeling
+			% ARGoS can perform basic communication modeling
+				% One example of implementation is check for line of sight conditions
+				% Can account for pathloss
+				% No measure of channel effects
+					% Pathloss, TX/RX Power level
+					% Packet corruption, delay, duplication
+					% Latency
+					% Throughput   		
+		% Can use the full implementation of B.A.T.M.A.N. or other routing/networking software
+			% Instead of coding the behavior of B.A.T.M.A.N. (or other routing from scratch) and having to verify it is functionally the same, use EMANE to run actual B.A.T.M.A.N.
+				% The behavior can't be different if the program is the exact same as would be used in hardware
+		% Introduce machine learning to influence routing software
             % Machine learning models can run in real time in each EMANE node, and can communicate with other models and nodes through the EMANE network
             % Allows the same models to run in EMANE as would run on the physical robot
 
 
-\section{How was it implemented?}
+\section{Integrating the Software}
+
     % Two simulation/emulation programs run simultaneous on the same machines
         % ARGoS and EMANE are both configured and run separately
-            % They exist as separate processes during the extent of runtime (one is not a child of the other)
-        % ARGoS opens shared memory and populates with metadata (including process ID), ARGoS then sleeps waiting for EMANE to wake it up
-            % ARGoS and EMANE use their respective programming language's provision for shared memory access
-        % EMANE waits until it can find shared memory with ARGoS PID, proceeds to set up remaining shared memory, creates internal data structures, wakes ARGoS, then sleeps
-        % ARGoS does internal processing, provides EMANE with new robot locations, info on which robots want to transmit, how much data each robot wants to transmit, wakes EMANE and sleeps
-        % EMANE updates its network nodes with the new locations, determines how much data each robot (that wants to transmit) can send, reports this information to ARGoS, wakes ARGoS, and sleeps
-        % This process then continues until ARGoS is finished with its experiment and signals EMANE to shutdown, before shutting down itself
-    % (FIGURE\_EMANE-ARGOS\_Interface)
-    
+            % They exist as separate processes during the extent of runtime (one is not a child of the other) 
 
-\section{Why was it implemented this way?}
+	% A third process exists (EMANE Interface Manager)
+		% EMANE on its own is a collection of programs
+		% Requires something to manage all of the processes
+		% Python script that runs as the broker between ARGOs and EMANE proper
+
+    % ARGoS starts by opening shared memory and populates with metadata (including process ID) during it's initialization phase
+		% (FIGURE: Shared Memory Metadata)
+  		% By providing PIDs, the two programs can interact with each other
+	% ARGoS then goes to sleep after initialization, waiting for EMANE-Interface to find the shared memory, and do its setup
+		% Since the location of the shared memory is known, one of the processes (the one that doesn't make it) can find information from the other without knowing the PID of the other
+	% EMANE-Interface populates the rest of the metadata (primarily just its PID) and sets up a shared memory location for robot pose information (location data), and robot communication data (amount of data requested to be transferred)
+		% (FIGURE: Shared Memory Pose)
+		% (FIGURE: Shared Memory Comm)
+		% ARGoS knows where to find these shared memories (ARGoS does not create them itself because originally EMANE was supposed to create all of them, this led to issues with step 1)
+		% EMANE-Interface then sets up internal data structures to store robot information and communication before waking ARGoS and going to sleep
+			% The two processes communicate with each other using POSIX signals, specifically SIGSTOP to put itself to sleep and SIGCONT to wake itself
+				% These signals are nice because the OS will handle stoping and waking the processes, and as such the singals are caught and handled before arriving at the process
+	% ARGoS takes its turn, moving robots, sensing the environment, etc. for 100ms before it updates information about the robot poses, and communication pairs
+	% EMANE-Interface then takes its turn, simulating 100ms of communication, updates shared data, and starts ARGoS
+		% This is done using a simple throughput test (iperf) to determine how much data can travel through the network to a give node
+		% Because there is no way to measure 100ms of data transfer easily, EMANE-Interface extrapolates the amount of data sent by dividing the speed over 1 second by 10
+	% This continues until ARGoS is finished with its experiment, at which point ARGoS starts a new experiment or terminates, informing EMANE-Interface of termination
+
+	% This Figure shows the overall connection between the two software	
+	% (FIGURE: EMANE-ARGOS Interface)
+
+
+\section{Integration Design Decisions}
+
+	% Several desisions during the design of the above proces had to be made
+		% These decisions were made in the hopes to maximize performance, minimize latency, and ensure stability
+
+	% Because EMANE operates in real-time as effectively a network (i.e., nothing happens on EMANE without it getting started by a process), EMANE continues running
+		% This creates oddities with "simulation time" versus "real time" but 
+
     % Why were certain design decisions made?
         % Shared memory
             % Less latency than something like a socket
@@ -45,6 +101,18 @@
             % The payoff from this work was deemed not worth it as the behavior of informing each robot how much data it sent and received accomplished the same goal
             % The payload was not being sent with a lossless protocol so the behavior of if the data arrives or not is much more important (robots would not be retransmitting)
 
-            
+	% Issues with C vs Python programming languages (typing and shared memory)
+
+\section{Integration Results}
+
+	% EMANE and ARGoS are capable of working together
+		% Demonstrate ARGoS moving EMANE nodes
+		% Demonstrate EMANE returning data transmission values (?)
+	% However, EMANE seriously slows down ARGoS
+		% We expected this
+		% EMANE is an emulator and runs at a minimum, real time
+		% What 
+		% Can we make it faster?
+
 \section{Chapter Summary}
 
