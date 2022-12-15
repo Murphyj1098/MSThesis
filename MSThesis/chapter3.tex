@@ -1,14 +1,15 @@
 \chapter{Hybrid Wireless Rural Broadband Networks}
 \label{chapter3}
 
+    % This is the first use-case for EMANE
     % System was designed as an easily implementable, low-cost solution for communities that are too small for a dedicated fiber backhaul, but still close enough to the fiber for a wireless solution
 
 \section{What was implemented?}
-    % Hardware test bed utilized a mmWave backhaul and Ubiquiti LTU radios for the distribution network
+    % Hardware testbed utilized a mmWave backhaul and Ubiquiti LTU radios for the distribution network
     % mmWave and LTU were abstracted using rfPipe in EMANE
     % Allowed for testing throughput and bandwidth characteristics with multiple hosts connected as well as range using simple pathloss models
 
-\subsection{OVERCOME Test-bed}
+\subsection{OVERCOME Testbed}
     % Topology
         % (FIGURE\_OVERCOMETopology)
         % Two sets of mmWave backhauls
@@ -20,7 +21,7 @@
         % (turns into)
         % mmWave rfPipe model, virtual bridge acting as a switch, virtualized pfSense router in VirtualBox, LTU rfPipe model
 
-\subsection{ZoomTEL Test-bed}
+\subsection{ZoomTEL Testbed}
     % Topology
         % (FIGURE\_ZoomTELTopology)
         % Two-hop mmWave backhaul
@@ -47,7 +48,7 @@
         % In EMANE?
             % Tools like iperf3 were used for generating traffic
             % Test probes in EMANE were used for monitoring the "behavior" of the physical channel
-        % In the hardware test-bed?
+        % In the hardware testbed?
             % Ookla's speed test was used for collecting data through homes
             % pfSense router monitored and recorded total data usage via the "bandwidthD" utility
             % iftop was used (as apart of the intelligent router) and recorded average bandwidth usage during certain testing periods
@@ -61,9 +62,8 @@
         % Anything else?
 
 
-\section{Compare EMANE results to real test-bed?}
-    % Are the measured throughputs and latencies the same in hardware and in EMANE?
-    % Sorta, OVERCOME is slightly difference because it is designed for customer use (uplink and downlink are not symmetric, but total throughput is kinda similar, read: better hardware)
+\section{Compare EMANE results to real testbed?}
+    % How similar are the results from EMANE to the heardware testbed?
 
 \section{Chapter Summary}
 

@@ -1,13 +1,66 @@
 \chapter{Overview on Network Emulation and Simulation}
 \label{chapter2}
 
-\section{Network Simulation and Emulation}
-    % General information on network emulation and simulation (?)
-Several tools exist for simulating networks and testing networking protocols and topologies.
-These tools can vary from modeling the behavior of large-scale networking protocols to modeling the physical characteristics of a single wireless channel.
+Before utilizing the EMANE tool and presenting several situations the tool can be used in, it must first be understood why it was selected and why network emulation is used over simulation or hardware testbeds in this thesis.
+After justifying the choices behind selecting EMANE, we will provide an in-depth tutorial on the installation, configuration, and operation of the tool.
+A brief overview of mobile ad-hoc network (MANET) routing protocols is presented. These protocols are essential to understand because EMANE operates its networks as if they were MANETs and uses these protocols to route between nodes.
+Lastly, an overview of network resource scheduling is presented to provide essential understanding for one of the use cases EMANE is tested in.
 
-\subsection{Evaluation of Network Simulation Tools}
-    % Why EMANE was selected over other tools
+\section{Testing Communication Networks} % General information on network emulation and simulation and hardware testbeds
+There are typically three ways new network architectures, technologies, and protocols are developed and tested. These are network simulation, network emulation, and hardware testbeds~\cite{simulation_emulation}.
+As expected each of the three methods has pros and cons.
+    % Network Hardware
+        % Expensive
+        % Time consuming to deploy
+        % Errors can be sporadic
+Hardware testbeds are the most accurate since they encompass the devices expected to be used in the network once development and testing is done.
+Hardware, however, is expensive to purchase, time-consuming to deploy, and often difficult to troubleshoot if errors do not consistently appear~\cite{nsclick}.
+This makes hardware testing not accessible to users that have a low budget. \par
+    % Network Simulation
+        % Mimic the behavior of a network
+        % Uses mathematical models
+        % Can run faster than real time
+Network simulation is one solution to testing that appears to solve many of the issues with testing on hardware.
+Several free and open-source network simulators like ns-3~\cite{ns3} or OMNeT++~\cite{omnet++} are commonly use and provide a solution to the high costs of hardware.
+Like most network simulators, these simulators operate on the concept that the behavior of a network and its components can be modeled via statistical and mathematical models.
+Creating models for network behavior allows simulators to run faster than real time since the models do not need to wait for effects to actually happen.
+The caveat to this, however, is that simulation models need to be highly accurate when developed or else results from the simulation will not match expected hardware behavior.
+Researchers creating new simulation models must ensure the models are validated against the expected hardware behavior \cite{omnet_manager}.
+Simulation also has the benefit of being highly repeatable since the behavior of the network can be more tightly controlled and any random processes can be set up to repeat previous random outputs \cite{simulation_emulation}. \par
+    % Network Emulation
+        % Operates on real network data
+        % Allows integration with hardware
+        % Potentially more overhead
+    % TODO: Find citations for me
+Network emulation exists somewhere between testing on hardware and testing inside a simulation.
+These emulators are still software that gets used to mirror the behavior of a testbed like simulators, but emulators operate on real network data instead of modeling the behavior of a network.
+Because emulation testbeds operate on actual network traffic, they also have the ability to interface with hardware allowing hardware testing without building a full hardware network.
+This characteristic of operating on real network traffic also has the downside of introducing more computation overhead.
+% Computer needs to manage network traffic + whatever effects are being imparted onto the network traffic
+
+% Table summarizing differences between three methods
+\begin{table}
+	\caption{Pros and Cons of Different Types of Network Testing}
+	\begin{adjustbox}{width=\textwidth, center=\textwidth}
+		\begin{tabular}{|l|l|l|}
+			\hline
+			Testbed Type & Pros                                                                                                                                                                       & Cons                                                                                                                                                                  \\
+			\toprule
+			Hardware     & \begin{tabular}{@{\labelitemi\hspace{\dimexpr\labelsep+0.5\tabcolsep}}l@{}}Highly accurate\\Does not require modification of networking software\end{tabular}                                 & \begin{tabular}{@{\labelitemi\hspace{\dimexpr\labelsep+0.5\tabcolsep}}l@{}}Expensive to build\\Time consuming to deploy and configure\\Errors can be sporadic\end{tabular}               \\
+			\hline
+			Simulation   & \begin{tabular}{@{\labelitemi\hspace{\dimexpr\labelsep+0.5\tabcolsep}}l@{}}Free tools available\\Can run faster than real time\\Easy to reconfigure and modify\end{tabular}                   & \begin{tabular}{@{\labelitemi\hspace{\dimexpr\labelsep+0.5\tabcolsep}}l@{}}Models must be designed to be highly accurate\\Software must be translated to a simulation model\end{tabular} \\
+			\hline
+			Emulation    & \begin{tabular}{@{\labelitemi\hspace{\dimexpr\labelsep+0.5\tabcolsep}}l@{}}Free tools available\\Can run native implementations of network software\\Can interface with hardware\end{tabular} & \begin{tabular}{@{\labelitemi\hspace{\dimexpr\labelsep+0.5\tabcolsep}}l@{}}Must run in real time\\Requires higher computational overhead\end{tabular}                                    \\
+			\hline
+		\end{tabular}
+	\end{adjustbox}
+	\label{simtable}
+\end{table}
+
+Table~\ref{simtable} summarizes the pros and cons of testing in hardware, simulation, and emulation.
+
+
+\section{Evaluation of Network Testing Tools} % Why EMANE was selected over other tools
 One of the most well known, and most used network simulation tools is ns-3.
 ns-3 is a discrete-event network simulator that was developed to simulate and research wireless and IP networks.
 ns-3 is not limited to wireless and IP-based networks, as thanks to its open-source nature, many models for simulating other types of networks are also available.
@@ -15,19 +68,19 @@ This option was inevitably not selected as the software to be used for this rese
 
 The Extendable Mobile Ad-hoc Network Emulator (EMANE) is a network emulation tool originally developed by the Naval Research Lab and currently maintained by AdjacentLink LLC.
 The software was developed with the intention of creating a platform that could emulate the physical and data link layers of the OSI network model.
-This focus on customizability of the physical and link layers is one of the main draws of EMANE because it allows for highly customizable models of physical channels to be used. 
-EMANE consists of several subsystems and components required to create a fully functional test-bed.
+This focus on the customization of the physical and data link layers is one of the main draws of EMANE because it allows for highly customizable models of physical channels to be used. 
+EMANE consists of several subsystems and components required to create a fully functional testbed.
 This creates an initial steep learning curve when using the software, and despite being open-source, the online community around EMANE is rather small with very little active discussion happening about the tool.
 Despite all this, once the user forms a core understanding of the tools and systems within the software, the tool can be used to effectively and quickly create model wireless networks.
 For this reason EMANE and combined with the details of the other network simulation tools.
 
-\subsection{Using EMANE}
+\section{Using EMANE}
     % Basic installation instructions
         % Install pre-complied bundle
         % Build and install OLSR
         % Enable BATMAN-adv and install batctl
         % Verify programs are installed
-There are several ways EMANE can installed for use.
+There are several ways EMANE can be installed for use.
 The primary two methods are to install the bundle of pre-built binaries provided by AdjacentLink or build the tools from source.
 The precompiled bundle is sufficient for the work completed in this thesis. Compiling the software from source is typically only necessary when 
         
@@ -42,12 +95,14 @@ The precompiled bundle is sufficient for the work completed in this thesis. Comp
 As previously mentioned, there are several systems that make up EMANE.
 The main three subsystems of note are the emulation processing system, the emulation transport boundary processing system, and the event processing system.
 
+\subsection{Emulation Model Processing}
     % Emulation Model Processing
         % Shared PHY model
             % Pathloss, fading, noise, pulling packets of OTA channel, power calculations
         % Radio model
             % Data bandwidth, delay, more advance medium access control schemes, SINR packet drop probabilities
 
+\subsection{Transport Boundary Processing}
     % Transport Boundary Processing
         % Raw transport
             % Use physical network device as edge of emulation
@@ -60,6 +115,7 @@ The main three subsystems of note are the emulation processing system, the emula
             % External transports
                 % NEMs on different platforms servers must share data through the kernel (since they will have network stack isolation)
 
+\subsection{Event Processing}
     % Event Processing
         % Event channel vs. OTA channel
             % Scripted before runtime
@@ -72,11 +128,20 @@ The main three subsystems of note are the emulation processing system, the emula
     % What is important in routing in a ad-hoc mobile network rather than a traditional network
     % What routing algorithms exist in literature
         % Reactive vs. Proactive
+EMANE was designed primarily to work with mobile ad-hoc networks, also known as MANETs.
+This special classification of network is characterized by its dynamic topology that often rapid changes due to the mobility of network nodes and the tendency of the wireless links to not be reliably connected.
+This lack of a fixed topology means that any node that exists in the network must be able to communicate without help from centralized infrastructure or a gateway and therefore must be able to independently make routing decisions \cite{puri2014routing}.
+EMANE's ability to move nodes freely around and reestablish links on the fly makes MANET routing protocols perfect for ensuring the emulated mesh is traversable.
+These types of routing protocols can be separated into two categories, proactive protocols and reactive protocols \cite{kaur2014performance}.
 
 \subsection{Proactive Mesh Routing}
         % Requires more overhead
         % Can (keep can, not will) react more quickly to topology changes
         % Periodically send out "discovery" packets to sense link quality/delivery topology info/etc.
+The first category of MANET routing protocol is the proactive protocol.
+Proactive protocols are similar to traditional routing protocols in the sense that they create and maintain a routing table.
+By maintaining a routing table, any transmission that needs to be sent can be done so immediately since the most efficient route is known.
+This allows proactive protocols to operate with less latency than reactive MANET routing protocols as they do not need to wait for route discovery at the time of transmission \cite{kaur2014performance}.
 
         % Examples:
             % OLSR
