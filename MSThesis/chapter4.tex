@@ -1,10 +1,16 @@
 \chapter{Networking Software Development Environment}
 \label{chapter4}
-
     % Broadband in rural situations is limited due to reasons explained in Chapter 3
     % In addition to creating and testing new topologies, other methods can be used to maximize the deliverable bandwidth
     % In this case, giving users bandwidth in an intelligent manner can allow the network to perform better
     % Utilizes the OVERCOME testbed from Chapter 3
+The second scenario EMANE was used for is the development of an intelligent resource allocation program.
+The goal of the network topology presented in \ref{chapter3} was to deliver greater amounts of connectivity to underserved rural communities.
+Introducing new networking hardware is one way of achieving this goal, but another potential for increasing the usability of the Internet is to better allocate resources in an intelligent manner.
+By using the EMANE testbed developed in the previous chapter, an accurate environment for developing this software can be created.
+Testing inside an emulated EMANE environment allows the software to still act on an accurate network without needing to be deployed to users.
+Developing in a production environment could have potentially several issues, such as violating the privacy concerns of users, or diminishing the quality of service a user experiences.
+This chapter will present the initial creation of a tool to achieve the goal of more intelligently distributing network resources.
 
 \section{Intelligent Method of Bandwidth Distribution}
     % A heuristic based router that intelligently allocates bandwidth to hosts
