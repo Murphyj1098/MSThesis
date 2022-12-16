@@ -1,15 +1,16 @@
 \chapter{Introduction}
 \label{ch:introduction}
 \section{Motivation}
-As the need Internet and wireless communications grow, more solutions for deploying networks are being conceived. 
-Networks are expensive to deploy and test, especially in rural environments where hybrid combinations of wireless technologies must be used and when using special networks (MANET) % Statistics on expensive network deployment (especially for testing and research)
+The need for wireless communications and network technology is rapidly growing.
+As more and more devices become network-enabled, the need for technology to support this rapid growth in wireless communication systems becomes apparent.
+Despite this need for interconnectivity, there is still a large divide 
+Networks are expensive to deploy and test, especially in rural environments where hybrid combinations of wireless technologies must be used and when using special network topologies like dynamic mobile ad-hoc networks.
 This creates a need for a low-cost, easy method to do initial testing on networks and network technologies to validate viability before spending money on hardware deployments and testing
-Use network simulation and emulation for preliminary testing as it can require little to no hardware, can be conducted in a lab, and costs less than building physical networks for each new experiment
-
+Use network simulation and emulation for preliminary testing as it can require little to no hardware, can be conducted in a lab, and costs less than building physical networks for each new experiment~\cite{broadband_factsheet, digital_divide, iot_spread}.
 
 \section{State of the Art}
 Many software and combination software-hardware platforms exist for testing networks.
-ns-3, NetSim, OPNET (now owned and operated by Riverbed)
+ns-3, GNURadio, OMNeT++, CORE
 
 
 \section{Current Issues}
@@ -23,9 +24,9 @@ Why are these simulators not as good?
 
 \section{Thesis Contribution}
 \begin{itemize}
-    \item EMANE is proposed as a valuable testing tool that addresses issues with other similar networking simulation tools. An overview of installing and using the tool is provided.
-    \item Develop an initial simple program for maximizing bandwidth in constrained networks and showed how EMANE can be used as a valuable development environment.
-    \item Basic integration between the robot swarm simulator, ARGoS, and EMANE allowing for more complex communications simulation between robots.
+    \item The Extendable Mobile Ad-hoc Network Emulator (EMANE) is proposed as a valuable testing tool that addresses issues with other similar networking simulation tools. An overview of installing and using the tool is provided.
+    \item An initial program designed to maximize bandwidth usage in a constrained wireless network is developed. It is shown how EMANE can be used as a network software development environment.
+    \item Basic integration between EMANE and the robot swarm simulator ARGoS is developed. EMANE is shown to be capable of extending and enhancing other tools to provide accurate communication emulation.
 \end{itemize}
 
 

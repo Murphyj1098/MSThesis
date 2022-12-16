@@ -1,0 +1,301 @@
+\chapter{ARGoS-EMANE Interface Source Code}
+\section{Main Code}
+\begin{minted}[fontsize=\small, linenos, breaklines]{python}
+#!/usr/bin/env python3
+
+import os
+import signal
+import struct
+import sys
+import time
+from multiprocessing import shared_memory
+
+from emane.events import EventService, LocationEvent
+
+from libs.structs import *
+from libs.drone import EMANEDrone
+
+META_FORM = 'HHdIIddd'
+META_SIZE = struct.calcsize(META_FORM)
+POSE_FORM = 'Hddd'
+POSE_SIZE = struct.calcsize(POSE_FORM)
+COMM_FORM = 'HHdd'
+COMM_SIZE = struct.calcsize(COMM_FORM)
+
+EMANE_PID = os.getpid()
+GW_ID = 0 # TODO: Select a constant ID for the gateway (Initialize a translation table between EMANE IDs and ARGoS IDs?)
+
+def handler_sigcont(sig, frame):
+    return
+
+def handler_sigterm(sig, frame):
+    shm_meta.close()
+    shm_pose.close()
+    shm_comm.close()
+    sys.exit(0)
+
+
+def wait_for_argos():
+    time.sleep(0.1)
+    os.kill(sys_meta.argos_pid, signal.SIGCONT)
+    print("Sending SIGCONT to " + str(sys_meta.argos_pid))
+    signal.raise_signal(signal.SIGSTOP)
+
+
+def translateID(ARGoS_ID):
+    pass
+
+def init():
+    signal.signal(signal.SIGTERM, handler_sigterm)
+    signal.signal(signal.SIGCONT, handler_sigcont)
+
+    global shm_meta
+    global shm_pose
+    global shm_comm
+
+    shm_meta_exists = False
+    while(not shm_meta_exists):
+        try:
+            shm_meta = shared_memory.SharedMemory(name="argos_emane_meta", create=False, size=META_SIZE)
+        except FileNotFoundError:
+            time.sleep(5)
+            continue
+        shm_meta_exists = True
+
+    global sys_meta
+    sys_meta = RobotMeta()
+    sys_meta.unpack(shm_meta)
+    sys_meta.emane_pid = EMANE_PID
+    sys_meta.pack(shm_meta)
+
+    print("ARGoS found continuing setup")
+
+    shm_pose = shared_memory.SharedMemory(name="argos_emane_pose", create=False, size=POSE_SIZE*sys_meta.num_drone)
+    shm_comm = shared_memory.SharedMemory(name="argos_emane_comms", create=False, size=COMM_SIZE*sys_meta.num_comms)
+
+    global drone_nodes
+    drone_nodes = [EMANEDrone() for i in range(sys_meta.num_drone)]
+
+    global robotpose
+    global robotcomm
+    robotpose = [RobotPose() for i in range(sys_meta.num_drone)]
+    robotcomm = [RobotComms() for i in range(sys_meta.num_comms)]
+
+    print("Setting up gateway node")
+    gateway_service = EventService(('224.1.2.8', 45703, 'control0')) # These values come from EMANE config files
+    gateway_loc = LocationEvent()
+    gateway_loc.append(GW_ID, latitude=sys_meta.gw_lat, longitude=sys_meta.gw_lon, altitude=sys_meta.gw_alt, yaw=0, pitch=0, roll=0)
+    gateway_service.publish(0, gateway_loc)
+
+
+def update_drone():
+    global shm_meta
+    global shm_pose
+    global robotpose
+
+    prev_drone = sys_meta.num_drone
+    sys_meta.unpack(shm_meta)
+
+    # NOTE: This should theoretically never fire (without EMANE being configured to start with more nodes than ARGoS)
+    #       EMANE can not create new nodes during runtime
+    if(prev_drone < sys_meta.num_drone):
+        shm_pose.close()
+        shm_pose = shared_memory.SharedMemory(name="argos_emane_pose", create=False)
+        robotpose = [RobotPose() for i in range(sys_meta.num_drone)]
+
+    for i in range(sys_meta.num_drone):
+        buf = shm_pose.buf[i*POSE_SIZE:(i+1)*POSE_SIZE]
+        robotpose[i].unpack(buf)
+        drone_nodes[i].id = robotpose[i].id
+        drone_nodes[i].lat = robotpose[i].lat
+        drone_nodes[i].lon = robotpose[i].lon
+        drone_nodes[i].alt = robotpose[i].alt
+
+    print("Sending location events to EMANE")
+    service = EventService(('224.1.2.8', 45703, 'control0')) # These values come from EMANE config files
+    for drone in drone_nodes:
+        drone.location_event(service)
+
+
+def communicate():
+    global shm_meta
+    global shm_comm
+    global robotcomm
+
+    prev_comms = sys_meta.num_comms
+    sys_meta.unpack(shm_meta)
+
+    if(prev_comms < sys_meta.num_comms):
+        shm_comm.close()
+        shm_comm = shared_memory.SharedMemory(name="argos_emane_comms", create=False)
+        robotcomm = [RobotComms() for i in range(sys_meta.num_comms)]
+
+    print(sys_meta)
+    # BUG: Correlate list index with drone id (breaks if drone poses or drone IDs are not in sequential order)
+    try:
+        for i in range(sys_meta.num_comms):
+            buf = shm_comm.buf[i*COMM_SIZE:(i+1)*COMM_SIZE]
+            robotcomm[i].unpack(buf)
+            # drone_nodes[0].inc_buffer(robotcomm[i].buff_size)
+            drone_nodes[i].buff = robotcomm[i].buff_size # NOTE:
+            robotcomm[i].sent = drone_nodes[i].do_broadcast()
+            buf = robotcomm[i].pack()
+            shm_comm.buf[i*COMM_SIZE:(i+1)*COMM_SIZE] = buf
+
+            # TODO: Check latency between all pairs and store to report to SySML
+    except:
+        pass
+
+if __name__=='__main__':
+    iternum = 0
+
+    init()
+    print(sys_meta)
+    while True:
+        wait_for_argos()
+        time.sleep(1)
+        update_drone()
+        communicate()
+
+        print(iternum)
+        iternum+=1
+\end{minted}
+
+\section{Shared Memory Data Structures}
+\begin{minted}[fontsize=\small, linenos, breaklines]{python}
+import struct
+from ctypes import *
+from dataclasses import dataclass
+
+@dataclass
+class RobotMeta():
+    """
+    Struct containing metadata shared between ARGoS and EMANE
+
+    Attributes
+    ----------
+    num_drone - Number of active robots
+    num_comms - Number of robots attmempting to broadcast
+    deltaT    - Time per step
+    argos_pid - ARGoS Process ID
+    emane_pid - EMANE Process ID (PID of Interface Script, not EMANE itself)
+    gw_lat    - Latitude coordinate of gateway node
+    gw_lon    - Longitude coordinate of gateway node
+    gw_alt    - Altitude (meters) of gateway node
+    struct_format - Metadata used to unpack data from shared memory
+    """
+    num_drone: c_ushort = None
+    num_comms: c_ushort = None
+    deltaT:    c_double = None
+    argos_pid: c_uint = None
+    emane_pid: c_uint = None
+    gw_lat:    c_double = None
+    gw_lon:    c_double = None
+    gw_alt:    c_double = None
+
+    __struct_format: str = 'HHdIIddd'
+
+    def unpack(self, shm):
+        self.num_drone, self.num_comms, self.deltaT, self.argos_pid, self.emane_pid, self.gw_lat, self.gw_lon, self.gw_alt \
+            = struct.unpack(self.__struct_format, shm.buf.tobytes())
+
+    def pack(self, shm):
+        buf = struct.pack(self.__struct_format, self.num_drone, self.num_comms, self.deltaT, self.argos_pid, self.emane_pid, self.gw_lat, self.gw_lon, self.gw_alt)
+        shm.buf[:struct.calcsize(self.__struct_format)] = buf
+
+
+@dataclass
+class RobotPose():
+    """
+    Struct containing location of each robot
+
+    Attributes
+    ----------
+    id - Robot ID
+    lat - Latitude of robot
+    lon - Longitude of robot
+    alt - Altitude of robot
+    struct_format - Metadata used to unpack data from shared memory
+    """
+    id: c_ushort = None
+    lat: c_double = None
+    lon: c_double = None
+    alt: c_double = None
+    __struct_format: str = 'Hddd'
+
+    def unpack(self, buf):
+        self.id, self.lat, self.lon, self.alt = struct.unpack(self.__struct_format, buf)
+
+    def pack(self):
+        buf = struct.pack(self.__struct_format, self.id, self.lat, self.lon, self.alt)
+        return buf
+
+
+@dataclass
+class RobotComms():
+    """
+    Struct containing the communication data for each robot
+
+    Attributes
+    ----------
+    id_from - Robot ID Transmitting
+    id_to   - Robot ID Receiving
+    buff_size - Size of data robot wants to transmit (bytes)
+    sent - Size of data actually transmitted (bytes)
+    struct_format - Metadata used to unpack data from shared memory
+    """
+    id_from: c_ushort = None
+    id_to: c_ushort = None
+    buff_size: c_double = None
+    sent: c_double = None
+    __struct_format: str = 'HHdd'
+
+    def unpack(self, buf):
+        self.id_from, self.id_to, self.buff_size, self.sent = struct.unpack(self.__struct_format, buf)
+
+    def pack(self):
+        buf = struct.pack(self.__struct_format, self.id_from, self.id_to, self.buff_size, self.sent)
+        return buf
+
+\end{minted}
+
+\section{Drone Object}
+\begin{minted}[fontsize=\small, linenos, breaklines]{python}
+from dataclasses import dataclass
+from emane.events import *
+from ctypes import *
+
+@dataclass
+class EMANEDrone():
+    '''
+    Corresponds to a single drone node
+    Holds its own ID, Location, and TxBufferSize
+    
+    Attributes
+    ----------
+    id - Drone node ID
+    lat - Node's latitude
+    lon - Node's longitude
+    alt - Node's altitude
+    buff - Number of bytes this node needs to still transmit
+    sent - Number of bytes this node sent this iteration
+    '''
+    id:   c_ushort = None
+    lat:  c_double = None
+    lon:  c_double = None
+    alt:  c_double = None
+    buff: c_double = 0.0
+
+    def inc_buffer(self, size):
+        self.buff += size
+
+    def dec_buffer(self, size):
+        self.buff -= size
+
+
+    def location_event(self, service):
+        loc_event = LocationEvent()
+        loc_event.append(self.id, latitude=self.lat, longitude=self.lon, altitude=self.alt, yaw=0, pitch=0, roll=0)
+        service.publish(0, loc_event)
+        return 0
+\end{minted}

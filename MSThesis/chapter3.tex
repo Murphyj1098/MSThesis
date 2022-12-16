@@ -1,8 +1,7 @@
 \chapter{Hybrid Wireless Rural Broadband Networks}
 \label{chapter3}
-
-    % This is the first use-case for EMANE
-    % System was designed as an easily implementable, low-cost solution for communities that are too small for a dedicated fiber backhaul, but still close enough to the fiber for a wireless solution
+The first testing scenario EMANE was used for was emulating two wireless, hybrid network topologies that were designed to more effectively deliver broadband to small rural communities.
+The important factors to emulate
 
 \section{What was implemented?}
     % Hardware testbed utilized a mmWave backhaul and Ubiquiti LTU radios for the distribution network
@@ -38,6 +37,41 @@
     % Creating mmWave and LTU in EMANE
         % Use rfPipe to mimic characteristics of mmWave and LTU
             % Bandwidth, delay, throughput, frequency of interest, distance between radios, antenna RX and TX gains
+\begin{table}
+\centering
+\caption{mmWave Model EMANE Parameters}
+\begin{tabular}{lr} 
+\hline
+\multicolumn{1}{c}{EMANE Parameter} & \multicolumn{1}{c}{Value} \\ 
+\hline
+Delay & 0.5ms \\
+Data Rate & 1Gbps \\
+Frequency & 60GHz \\
+Channel Width & 500MHz \\
+Fixed Antenna Gain & 43dBi \\
+Pathloss Model & \multicolumn{1}{l}{Freespace} \\
+\hline
+\end{tabular}
+\label{mmwave_params}
+\end{table}
+
+\begin{table}
+\centering
+\caption{Ubiquiti LTU Model EMANE Parameters}
+\begin{tabular}{lr} 
+\hline
+\multicolumn{1}{c}{EMANE Parameter} & \multicolumn{1}{c}{Value} \\ 
+\hline
+Delay & 2.5ms \\
+Data Rate & 200Mbps \\
+Frequency & 5.8GHz \\
+Channel Width & 20MHz \\
+Fixed Antenna Gain & 19.5dBi \\
+Pathloss Model & \multicolumn{1}{l}{Freespace} \\
+\hline
+\end{tabular}
+\label{ltu_params}
+\end{table}
 
     % Interfacing with a real pfSense router in EMANE
         % Use EMANE transport plugins to delivery and receive real TCP/IP packets from a virtualized router
