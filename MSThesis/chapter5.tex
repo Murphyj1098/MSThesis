@@ -4,9 +4,8 @@
 		% Combinatation use-case:
 			% Work with other software
 			% Emulate a distributed, dynamic network
-The third use case for EMANE in this thesis is a combination use case.
-The primary work that will be covered in this chapter relates to extending the robot swarm simulator ARGoS~\cite{argos}, to introduce emulated communication models.
-In addition to this, EMANE will also be operating to emulate a distributed, dynamic network in the form of the robot swarm.
+This chapter presents the third and final use case for EMANE that was explored for this thesis.
+The primary work that will be covered relates to extending the robot swarm simulator ARGoS~\cite{argos}, to introduce emulated communication models.
 	% Overview of the swarm + swarm network architecture
 		% Swarm of 25 robots deployed to make environmental observations
 		% Example deployment to wildfire (hostile area, remote)		
@@ -14,10 +13,10 @@ In addition to this, EMANE will also be operating to emulate a distributed, dyna
 		% Maintain the network
 		% Share information between robots (to make better decisions)
 		% Return information back to central command
-The network outlined in this chapter is a swarm of 25 simulated flying robots, that are tasked with identifying wildfire in an area.
-By operating in the context of a wildfire, several interesting environmental factors are introduced that must be considered.
-Primarily, the conditions are not prime for wireless communications as smoke or other obstacles may exist, but also well-deployed, centralized infrastructure is unlikely to exist.
-This means that communications must happen in a distributed manner across the swarm mesh, and traffic must be relayed to reach a command center.
+The network outlined in this chapter consists of a swarm of 25 simulated flying robots that are tasked with identifying wildfire in an area.
+By operating in the context of a wildfire, several environmental factors are introduced that must be considered.
+Primarily, the conditions this network is present in are not prime for wireless communications as smoke or other obstacles may exist, and well-deployed, centralized infrastructure is unlikely to be present.
+To this end, communications must happen in a distributed manner across the swarm mesh, and traffic must be relayed to reach a command center.
 	% This network is a MANET (EMANE's specialty)
 		% Routing is key (the links connect and disconnect rapidly)
 These conditions are the ideal operating parameters for a mobile ad-hoc network (MANET) configuration, which is EMANE's specialty.
@@ -185,34 +184,80 @@ Appendix~\ref{appendixc} contains the full source code of the EMANE side of the 
 		% These decisions were made in the hopes to maximize performance, minimize latency, and ensure stability
 Several design decisions were made during the development of the above process with the goal of maximizing the performance of the interface, minimizing the latency between each process running, and ensuring the system remained stable.
 The two biggest decisions made were the decision to use shared memory to share information and the decision to abstract the data being sent through EMANE.
-These decisions ensured that the interface would still be accurate, without being needless complex and slow. 
+These decisions ensured that the interface would still be accurate, without introducing unnecessary complexities that would further slow down the system.\par 
     % Why were certain design decisions made?
         % Shared memory
             % Less latency than something like a socket
             % The amount and size of data is known enough that appropriate blocks of memory can be opened
-
-        % Why abstract transmission -> (Don't send actual payload through EMANE)
-            % Sending the actual payload would require lots of additional work (each robot in ARGoS would need to deliver its payload to its corresponding node in EMANE, and then retrieve any data waiting for it)
-            % The payoff from this work was deemed not worth it as the behavior of informing each robot how much data it sent and received accomplished the same goal
-            % The payload was not being sent with a lossless protocol so the behavior of if the data arrives or not is much more important (robots would not be retransmitting)
-
+It was decided that one or more shared memory segments should be used to pass information between processes.
+Transferring data over the network was deemed needlessly slow and complex.
+The time taken to output data from the tool, package it appropriately, send it over the network, unpack it, and import it would have a taken an order of time longer than the actual time needed to generate and consume the data being sent.
+Since networking was not to be used, both processes needed to run on the same machine and have access to the same hardware.
+For the same reason that networking the data would be slow, performing file I/O to read and write data to a file would have also been too slow.
+Since both processes are capable of accessing memory incredibly quick, using the operating system to grant ARGoS and EMANE access to the same location in system memory was the logical solution.\par
+The second major design decision, was to not provide EMANE with the exact data payloads ARGoS was sending between robots.
+    % Why abstract transmission -> (Don't send actual payload through EMANE)
+        % Sending the actual payload would require lots of additional work (each robot in ARGoS would need to deliver its payload to its corresponding node in EMANE, and then retrieve any data waiting for it)
+        % The payoff from this work was deemed not worth it as the behavior of informing each robot how much data it sent and received accomplished the same goal
+        % The payload was not being sent with a lossless protocol so the behavior of if the data arrives or not is much more important (robots would not be retransmitting)
+ARGoS, and the algorithm running on the robots that requires communication, is not concerned with any form of transmission control or retransmission upon failed delivery of data.
+This means that EMANE does not need to worry about what data successfully makes it to the receiver, just how much of it arrives.
+By avoiding handing off the entire data payload to EMANE, time can be saved and a layer of complexity can be removed.
+EMANE instead can just characterize the transmission, and inform ARGoS of what amounts of data can be given to each robot in a certain timeframe.
+This does not compromise the validity of the channel effects EMANE imparts on transmission, as throughput and latency are the primary two metrics being measured anyway (as witnessed in Chapter~\ref{chapter3}).\par
 	% Issues with C vs Python programming languages (typing and shared memory)
-	% Because EMANE operates in real-time as effectively a network (i.e., nothing happens on EMANE without it getting started by a process), EMANE continues running
-		% This creates oddities with "simulation time" versus "real time" but 
+One of the major issues during development that had to be addressed was the difference in programming languages used.
+ARGoS, and therefore its portion of the interface code, is written in C++.
+The EMANE interface manager, is written in Python.
+Since data was being accessed directly from memory, it was important that the exact size of the data was accurately read.
+C++ provides the user with data types that are not present in Python, with most data types in Python taking up larger amounts of space than the closest equivalent in C/C++.
+Even if using a library like ctypes, meant to introduce more "C-like" types, the problem was still present.
+The solution ended up being to serialize and deserialize the data instead of mapping the data directly to a structure, like was done in C++.
+The following code snippet uses a format string to interpret the exact number of bytes each variable should be for serialization and serialization
+\begin{minted}[fontsize=\footnotesize, breaklines]{python}
+__struct_format: str = 'HHdIIddd'
+
+def unpack(self, shm):
+	self.num_drone, self.num_comms, self.deltaT, self.argos_pid, self.emane_pid, self.gw_lat, self.gw_lon, self.gw_alt \
+		= struct.unpack(self.__struct_format, shm.buf.tobytes())
+\end{minted}
+This solution works well to solve the problem, and while it may be slower than the process used for memory access in C++, it is still much faster than EMANE is expected take and should not affect overall run time.
+Further testing can be performed to determine if the interface script would have an improvement on performance if written entire in C++.
 
 \section{Integration Results}
-
 	% EMANE and ARGoS are capable of working together
 		% Demonstrate ARGoS moving EMANE nodes
-
+The basic ability for ARGoS and EMANE to pass information back and forth is present, with ARGoS delivering robot locations and EMANE delivering communications metrics, but several factors remain to be implemented or improved upon.
+Figure~\ref{emane_locs} shows a print out of the EMANE's event channel.
+By using the \textit{emaneevent-dump} utility, any events sent through EMANE can be seen.
+As witnessed in Figure~\ref{emane_locs}, EMANE is receiving location events over time as ARGoS updates the manager script with new locations.
+\begin{figure}[!ht]
+    \centering
+    \includegraphics[width=0.9\textwidth,keepaspectratio]{Images/Chpt5/ARGoS_Events_EMANE_annotated.png}
+    \caption{A dump of several events that were sent over the EMANE event channel. These location events show that ARGoS is delivering location data to the interface script, which is subsequently delivering location events to EMANE.}
+    \label{emane_locs}
+\end{figure}
+It can be seen from the initial numbers in square brackets that these events are only firing about every one second.
+Since these events should be firing for every 100ms of simulation time, we see that simulating 100ms of time is taking ARGoS and EMANE a combined, ten times longer.
+This behavior was expected from the start, but the extent of how bad it would be had been unknown.\par
+EMANE runs in real time and therefore at a minimum would take 100ms to create 100ms of data.
+However, because the network needs time to reconfigure after locations are updated, and the throughput tests need time to record data, it is much more likely that EMANE takes anywhere from two to five times as long to generate that data.
+The ten times longer observed above is on the extreme side and was recorded before optimizations were started, however additional optimizations would be needed to bring that number down further, if possible.
+As a final point to understand the extent of the slowdown imparted on ARGoS by combining it with a real time emulator, ARGoS running in isolation using an internal communication medium plugin only takes about four seconds to run a 10-minute experiment.
+With the best case scenario of EMANE adding 200ms of time per 100ms emulation block, the ten-minute experiment would now take twenty minutes.
+This length of emulation may be an acceptable trade off for the features EMANE brings to the testbed, but is an essential consideration that must be made.
 	% However, EMANE seriously slows down ARGoS
 		% We expected this
 		% EMANE is an emulator and runs at a minimum, real time
 		% What are the performance differences between ARGoS Standalone and ARGoS + EMANE
 			% ARGoS Standalone takes 4 seconds for a 10 minute experiment
-			% ARGoS+EMANE takes 20 for the same experiment (with most basic settings)
+			% ARGoS+EMANE takes 20min or more for the same experiment (with most basic settings)
 				% Not including any checking of latency, just pure data return
 		% Can we make it faster?
 
 \section{Chapter Summary}
-
+This chapter focused on introducing additional tools to EMANE to enable EMANE to more dynamically model certain networks.
+By interfacing with the ARGoS robot simulation tool, both tools receive enhancements in the forms of more accurate modeling of all parts of a robot swarm network.
+The primary results found were that the software are able to communicate through the designed methodology, but the real time nature of EMANE slows down ARGoS drastically.
+At the time of writing the interface is in the earlier stages of development with only the basic functionality presented here implemented.
+The work is being continued in a hope to further optimize the process and deliver additional functionality to both tools.
