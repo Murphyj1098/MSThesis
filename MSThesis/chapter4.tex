@@ -4,8 +4,8 @@
     % In addition to creating and testing new topologies, other methods can be used to maximize the deliverable bandwidth
     % In this case, giving users bandwidth in an intelligent manner can allow the network to perform better
     % Utilizes the OVERCOME testbed from Chapter 3
-The second scenario EMANE was used for is the development of an intelligent resource allocation program.
-The goal of the network topology presented in \ref{chapter3} was to deliver greater amounts of connectivity to underserved rural communities.
+The second scenario EMANE was used for was the development of an intelligent resource allocation program.
+The goal of the network topology presented in Chapter~\ref{chapter3} was to deliver greater amounts of connectivity to underserved rural communities.
 Introducing new networking hardware is one way of achieving this goal, but another potential for increasing the usability of the Internet is to better allocate resources in an intelligent manner.
 By using the EMANE testbed developed in the previous chapter, an accurate environment for developing this software can be created.
 Testing inside an emulated EMANE environment allows the software to still act on an accurate network without needing to be deployed to users.
@@ -13,40 +13,167 @@ Developing in a production environment could have potentially several issues, su
 This chapter will present the initial creation of a tool to achieve the goal of more intelligently distributing network resources.
 
 \section{Intelligent Method of Bandwidth Distribution}
-    % A heuristic based router that intelligently allocates bandwidth to hosts
-    % Based on the behavior of uploads and downloads
+The original proposal for the software developed in this chapter was to utilize machine learning tools to create a model that would be able to allocate resources in a network with high accuracy.
+This was deemed to be too complex of a first step and so instead a heuristic approach was decided upon with a special focus on determining if EMANE could make an adequate development environment.
+The primary thought behind the intelligent router program was that using a static cap for each house on the network is not efficient, and even using a scheme were certain hosts are able to have higher reservations would leave too much bandwidth unused.
+The ideal scenario is that the only time the network should not be at 100\% usage is when there are enough users on to bring it to capacity.
+There should not be a situation where a user is not able to access resources simply because they are allocated to another user that is not using them.\par
+To facilitate the development of this tool, the OVERCOME EMANE testbed from Chapter~\ref{chapter3} was modified to create a better environment to develop under. 
+Figure~\ref{pfsense_dev} shows the modified environment.
+The primary difference is the removal of the mmWave EMANE environment and direct connection of the router to the Internet.
+The intelligent router was only concerned with the individual distribution of network resources from the aggregated central point and as such the characteristics of the mmWave backhaul were deemed unnecessary.
+The program was of course deployed to the full OVERCOME EMANE testbed before deployment to hardware, but this was a very minor test to ensure the behavior did not change.
+\begin{figure}[!ht]
+    \centering
+    \includegraphics[width=\textwidth,keepaspectratio]{Images/Chpt4/pfsense_dev.png}
+    \caption{The modified OVERCOME EMANE testbed used for development of the intelligent router program. The primary modification is the removal of the mmWave environment.}
+    \label{pfsense_dev}
+\end{figure}
 
+\section{Implementing the Software}
+The algorithm for allocating bandwidth effectively consists of two major stages, classification of the current state of the network, and allocation to modify the state of the network.
 
-\section{Implementation Methodology}
-    % (FIGURE\_classify+allocate\_flowcharts)
+\subsection{Stage 1: Classification}
     % Want to classify each host's current upload/download usage
         % Used tool: iftop to get average usage over 2 seconds, record usage every 6 seconds (10 times per minute)
-        % (FIGURE\_iftop)
+In order to determine how bandwidth should be distributed to the network, the program first needed to be aware of the current state of the network.
+There were a few different tools that were considered to determine the current usage of each host on the network.
+Because of software was to run on pfSense, this greatly limited the available software, both because a majority of the usable packages were only available through the pfSense add-on library, but also because the tools could not tolerate any amount of vulnerability.
+On top of this most of the software pfSense made available was graphical (as pfSense is effectively a graphical layer for FreeBSD).
+Needing a tool that would output to the console, or have a redirectable output that could be intercepted by Python.
+The tool selected was \textit{iftop}.
+This tool takes the average bandwidth traveling through an interface and outputs the values.
+Figure~\ref{iftop_out} shows an example output of this tool. This data was used to find the IP address, upload, and download bandwidth in Kbps.
+Figure~\ref{log_file} is an example of a log file that shows the data iftop generates. (IP addresses have been blurred for user privacy).\par
+\begin{figure}[!ht]
+    \centering
+    \includegraphics[width=\textwidth,keepaspectratio]{Images/Chpt4/iftop_util.png}
+    \caption{An example of the output of the \textit{iftop} utility used to measure bandwidth on the OVERCOME network.}
+    \label{iftop_out}
+\end{figure}
+\begin{figure}[!ht]
+    \centering
+    \includegraphics[width=0.8\textwidth,keepaspectratio]{Images/Chpt4/LogFile.png}
+    \caption{An example of the data output but the classification stage of the intelligent router program. IP addresses have been censored for privacy.}
+    \label{log_file}
+\end{figure}
     % Use this classification to create priority tiers that influence how users get more bandwidth/bandwidth taken away
-        % What is the rationale behind these priorities (study on what types of behaviors use what types of bandwidth)
+    % What is the rationale behind these priorities (study on what types of behaviors use what types of bandwidth)
+The bandwidth data is then used to classify each host into a priority level.
+In order to not invade the privacy of the users on the network, it was decided that priority levels should not be determined based on the activity being completed by the user.
+To identify the task each user was performing would require examining the user's traffic which is not only computational inefficient, but also a breach of privacy and trust.
+In addition to this, our algorithm is not in a position to determine what type of traffic is more important.
+Identifying the difference between a Zoom meeting and a Netflix stream does not indicate which one should be prioritized and this was not a decision we were in a position to make.
+Instead, the four created priorities are based on the bandwidth usage of the user.
+Table~\ref{priority_table} shows the priority classifications, as well as the thresholds for "high" and "low" bandwidths.\par
+\begin{table}[!ht]
+\centering
+\caption{Priority groups for the intelligent router, based on user bandwidth behaviors}
+\begin{adjustbox}{width=0.8\textwidth, center=\textwidth}
+    \begin{tabular}{r|cc}
+    \multicolumn{1}{c|}{} & Download Behavior & \multicolumn{1}{l}{Upload Behavior} \\ 
+    \hline
+    Priority 1 & High ($>$5Mbps) & High ($>$200Kbps) \\
+    Priority 2 & High ($>$5Mbps) & Low ($>$200Kbps)\\
+    Priority 3 & Low ($<$5Mbps) & High ($>$200Kbps)\\
+    Priority 4 & Low ($<$5Mbps) & Low ($>$200Kbps)
+    \end{tabular}
+\end{adjustbox}
+\label{priority_table}
+\end{table}
+Once the priorities were assigned, the final step was to flag all hosts that needed reallocation.
+The criterion for receiving reallocation was having a current average usage that was within 5\% of the currently set cap.
+Meeting this criterion would indicate to the allocation stage that the house should receive more bandwidth (if possible).
+The logic for this reallocation is discussed in the next subsection.
+Figure~\ref{classification} provides an overview of the process described here.
+The full program code for the classification stage of the router can be found in Appendix~\ref{appendixb}.
+\begin{figure}[!ht]
+    \centering
+    \includegraphics[width=0.5\textwidth,keepaspectratio]{Images/Chpt4/Flowchart_Classification_Updated.png}
+    \caption{An overview of the algorithm that operates to classify each host on the network as a part of the intelligent router program.}
+    \label{classification}
+\end{figure}
+
+\subsection{Stage 2: Allocation}
     % Create these modifications to move bandwidth caps up and down via pfSense limiters
+Once the classification stage is complete, the allocation stage runs.
+This stage reads the data created by the previous stage and acts on it to impact the network and change the amount of bandwidth an individual house is able to use.
+The primary decisions made while designing the allocation stage related to the safety measures put in place to ensure no user was allowed too much or too little bandwidth.
+Since the algorithm was set up to continually take and give bandwidth, checks needed to be put in place to ensure a single house was not able to take up all the bandwidth, leaving none for the rest of the homes.
+After evaluating the average usages for the network, the minimum value a house could have was set to 7.5Mbps.
+This value was a rather conservative estimate and in all likelihood could have been set lower, however it did not impact the efficiency of the algorithm.
+Once these measures were put in place to protect the network, the method with which homes were limited had to be decided upon.
+Since the programming was running alongside pfSense, we had to be careful that the method we used to set limits would not be overridden by the primary router software.
+To ensure this, we used pfSense's Limiters tool, a setting that could be set on a firewall rule to ensure a maximum throughput.
+This method worked well because each house could be assigned a firewall rule based on its IP address, and each of those firewall rules would receive a limiter.
+Additionally, because this data was stored in an XML file, the Python script running the algorithm could easily edit and update the file, instead of trying to fight against the default configuration.\par
+With the design decisions out of the way, the steps that needed to be taken to allocate traffic were obvious.
+The first step was to look at the total amount of bandwidth allocated and determine if the network was at saturation.
+This was done by simply keeping a record of the total of all allocations that could be compared against the network total.
+If bandwidth was available, the algorithm would proceed to flag every flagged host's bandwidth cap by 5Mbps.
+If there was no bandwidth available, lower priority hosts that did not require as high limits would have their limits lowered, and the additional bandwidth could be redistributed.
+Once all flagged hosts either had their caps raised, or were deemed unable to have their capped raised, the program would wait six seconds before returning to the classification stage.
+This waiting period is primarily to account for inefficiencies in the pfSense system.
+Since pfSense directly was being used to change bandwidth caps, a small waiting period was required to allow the values to propagate.
+The full behavior of the allocation stage can be seen below in Figure~\ref{allocation}, and the full program code for the allocation stage of the router can be found in Appendix~\ref{appendixb}.
+\begin{figure}[!ht]
+    \centering
+    \includegraphics[width=0.5\textwidth,keepaspectratio]{Images/Chpt4/Flowchart_Allocation_Updated.png}
+    \caption{An overview of the algorithm that operates to allocate bandwidth to each host on the network as a part of the intelligent router program.}
+    \label{allocation}
+\end{figure}
 
-
-\section{Why was it implemented this way?}
-    % Heuristic behavior was selected over a machine learning model
-        % Why?
-    % System privacy concerns
-        % Did not want to classify based on the traffic type and what the user was doing
-        % To create a fair algorithm can not define one type of traffic as "more important"
-            % Is a Zoom call more important than a Netflix stream?
-            % Business vs. Pleasure BUT Zoom is not always business and Netflix is not always leisure
-    % Designed to be more system agnostic (tested on a pfSense Router)
-        % Utilizes pfSense-specific limiters but the idea of setting a limit is very universal
-        % Lighter weight than a ML algorithm likely would be, can be deployed closer to the last mile since it is lighter-weight
-
-        
 \section{Effectiveness of the Program}
+    % Is EMANE effective?
+Whether or not EMANE makes an appropriate environment to develop a tool like this is difficult to answer from the observed data and results.
+One of the primary benefits of developing in EMANE is that it is a closed environment that protects the program and developer from errors effecting the quality of a network.
+If the tool were to be developed in production, any small configuration error could easily result in taking down a network many people rely on.
+Conversely, developing on a generic computer, or a router connected to only a very limited number of hardware devices does not provide the traffic or tools necessary to test the behavior.
+By operating in EMANE, any number of "houses" can be connected downstream from the router, the amount of traffic being created at once and which hosts the traffic comes from is controlled, and the attributes of the communication medium can be fully controlled.\par
+This makes development very convenient, however, it is not a catch-all solution.
+One of the major problems discovered during development is that the generated test traffic did not match the behavior of the real user traffic enough.
+Traffic generated by a test tool like \textit{MGEN} is typically not dynamic enough to mirror the behavior of an individual, let alone an entire household.
+Extend this to covering the entire network, and generating test traffic that is accurate for five or ten households is a difficult task.\par
+One solution attempted during the development of the tool, was to use a packet capture (in the form of a PCAP file) to record the traffic of consenting users and play it across the network.
+The problem that was found with this is that different communities will have drastically different traffic usage behavior.
+The Internet usage of a New England college student does not necessarily match that of an adult in a rural area like Missouri.
+This became a problem during testing as the algorithm was reacting slower to needs for bandwidth than in testing as the high usages were more sporadic so the averaging approach at classification tended to classify lower than required.\par
     % Only deployed for an initial iteration due to network issues
         % No revisions made, only tested the most basic behavior
     % Not enough traffic/users on the network for meaningful data
         % At no point during any test was total network utilization above 50%, can't take bandwidth from users to give to others if there is always a pool
     % Ways to modify/fix the experiment and test environment to create a meaningful test
-
+The other major result from the testing of the router, was the discovery that effective testing of a program like this requires an ideal environment to test in.
+The OVERCOME network was not constrained at all due to the small number of houses connected.
+An attempt was made to constrain the network during testing, but was overall unsuccessful.
+The testing schedule proceeded as follows:
+\begin{itemize}
+    \item \textbf{Week 1:} No artificial bandwidth limits, no intelligent programs.
+    \item \textbf{Week 2:} All homes restricted to 25Mbps download in an attempt to create a lower max bandwidth cap
+    \item \textbf{Week 3:} Homes assigned dynamic restrictions based on the algorithm.
+\end{itemize}
+\begin{figure}[!ht]
+    \centering
+    \includegraphics[width=0.8\textwidth,keepaspectratio]{Images/Chpt4/Network_Usage.png}
+    \caption{The total network usage for thirty houses in the Project OVERCOME testbed during weeks 2 and 3 of the intelligent router test.}
+    \label{max_usage}
+\end{figure}
+Figure~\ref{max_usage} shows the total usage of the network during each classification record for the entire week 2 and 3 testing period.
+As can be seen by the blue traffic data, at no point during the two-week period was the usage in the network even at 50\% capacity.
+This caused the intelligent algorithm to never have to remove bandwidth from a user to give to another user, eliminating the point of the program.
+The artificial cap on the network also could not be lowered further, because the individual household would have such a low base restriction that users would be barely able to use the Internet during the control period.
+With the project near completion, it was determined that another test could not be run, and the algorithm would have to remain unfinished as future work to be potentially completed.\par
+One positive result from the test, however, was data confirming that a stratification of usage exists on the network.
+By confirming that there is a distribution of users that use a lot of bandwidth and users that use little, it supports the core concept of the algorithm that a flat distribution cap on a network, while fair, is not the most efficient use of resources. Figure~\ref{usage_compare} shows an example of two houses on the network. The top house which much higher usage, and the bottom house with less usage.
+\begin{figure}[!ht]
+    \centering
+    \includegraphics[width=0.8\textwidth,keepaspectratio]{Images/Chpt4/Network_Compare.png}
+    \caption{The total network usage for thirty houses in the Project OVERCOME testbed during weeks 2 and 3 of the intelligent router test.}
+    \label{usage_compare}
+\end{figure}
 
 \section{Chapter Summary}
-
+This chapter outlined the process for designing a piece of networking software while using EMANE as the network environment for development.
+More specifically, a program that sought to heuristically allocate network resources in an intelligent manner was outlined.
+The specifics of the environment the tool was developed in were highlighted and the behavior of the algorithm explained.
+The chapter finalizes by outlining lessons learned from the development and testing of the tool, with the main takeaway being 

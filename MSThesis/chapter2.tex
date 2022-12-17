@@ -30,7 +30,6 @@ Simulation also has the benefit of being highly repeatable since the behavior of
         % Operates on real network data
         % Allows integration with hardware
         % Potentially more overhead
-    % TODO: Find citations for me
 Network emulation exists somewhere between testing on hardware and testing inside a simulation.
 These emulators are still software that gets used to mirror the behavior of a testbed like simulators, but emulators operate on real network data instead of modeling the behavior of a network.
 Because emulation testbeds operate on actual network traffic, they also have the ability to interface with hardware allowing hardware testing without building a full hardware network.
@@ -165,12 +164,12 @@ EMANE version 1.3.3 was the primary version of the tool used in this work, and s
         % Optionally: Install extra software
 These instructions assume a fresh installation of Ubuntu 20.04.04 is being used and that is system is up-to-date with the latest software.
 If a different supported distribution of Linux is used, the steps will be similar, however the commands will differ. Refer to~\cite{emane_tutorial,emane_git} for further details.
-See Appendix A for a list of the specific commands run to complete the entire installation process % TODO: Reference Appendix A
+See Appendix~\ref{appendixa} for a list of the specific commands run to complete the entire installation process.
 \begin{enumerate}
     \item The first step is downloading the precompiled binaries. As seen in Figure~\ref{wget_emane}, the \textit{wget} utility is used to download the compressed file, but any method for retrieving this file can be used. This compressed file should be extracted before the next step.
     \item To install the downloaded binaries, the \textit{dpkg} application is used. Errors will be reported upon installation, as not all the dependencies are installed. This will be fixed after the initial installation via \textit{apt}. Figure~\ref{install_emane} shows the initial installation finishing with errors, and the command used to fix these errors.
     \item Lastly, we can verify that EMANE was installed correctly by having the program output its version. Figure~\ref{check_emane} shows that EMANE version 1.3.3 was successfully installed.
-    \item Once installation of EMANE has been verified, additional support software (like testing tools and routing protocols) can be installed to use with EMANE. Appendix A shows some examples of installing certain tools. % TODO: Reference Appendix A
+    \item Once installation of EMANE has been verified, additional support software (like testing tools and routing protocols) can be installed to use with EMANE. Appendix~\ref{appendixa} shows some examples of installing certain tools.
 \end{enumerate}
 
 \begin{figure}[!ht]
@@ -268,9 +267,6 @@ The following is an example of the contents of an antenna profile file from the 
         <elevation min='-15' max='-11'>
           <bearing min='0' max='5'>
             <gain value='0'/>
-          </bearing>
-          <bearing min='6' max='10'>
-            <gain value='-3'/>
           </bearing>
     \end{minted}
 \end{minipage}
@@ -478,7 +474,7 @@ Generally, reactive protocols are found to not be as effective in highly mobile 
 B.A.T.M.A.N. is found to have less maximum available bandwidth in some situations when compared to AODV, but will more reliably deliver packets successfully, and often is able to react to changes in the graph faster.
 For this reason, proactive protocols like OLSR and B.A.T.M.A.N. are more commonly used in simple EMANE testbeds, as seen in the tutorial~\cite{emane_tutorial}.\par
 All the testbeds in the remainder of this thesis will use the batman-adv implementation of the B.A.T.M.A.N. protocol.
-This implementation is built into the Linux kernel and installation instructions for using it can be found in Appendix A. % TODO: Update reference to Appendix A
+This implementation is built into the Linux kernel and installation instructions for using it can be found in Appendix~\ref{appendixa.}
 
 \section{Chapter Summary}
     % Chapter covered the basics of EMANE so that it may be used to set up and run experiments

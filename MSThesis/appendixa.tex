@@ -1,1 +1,50 @@
 \chapter{Installation of EMANE}
+\label{appendixa}
+\begin{minted}[linenos, breaklines]{text}
+EMANE + Addons v1.3.3:
+
+    Step 1: Install EMANE Bundle
+        $ cd EMANE_1.3.3-1_debs
+        $ sudo dpkg -i *.deb
+        $ sudo apt install -f
+
+    Step 2: Verify
+        $ emane -v
+
+OLSRD v0.9.8
+    Step 1: Dependencies
+        $ sudo apt install bison flex 
+
+    Step 2: Download Release
+        $ wget https://github.com/OLSR/olsrd/wiki/files/0.9.8/olsrd-0.9.8.tar.gz
+        $ tar xvf olsrd-0.9.8.tar.gz
+
+    Step 3: Make and Install
+        $ cd olsrd-0.9.8
+        $ make
+        $ sudo make install
+
+    Step 4: Verify
+        $ olsrd -v (NOTE: Might need to add install location [/usr/local/sbin] to PATH)
+
+OLSRD Plugins
+    txtinfo:
+        $ cd lib/txtinfo
+        $ make
+        $ sudo make install
+
+    bmf:
+        $ cd ../bmf
+        $ make
+        $ sudo make install
+
+iPerf v3.7
+$ sudo apt install iperf3
+
+gpsd + gpsd-clients v3.20
+$ sudo apt install gpsd gpsd-clients
+
+BATMAN:
+$ sudo apt install batctl
+$ sudo modprobe batman-adv
+\end{minted}
