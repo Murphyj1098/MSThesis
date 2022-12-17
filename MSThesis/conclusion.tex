@@ -2,13 +2,13 @@
 \label{conclusion}
 \section{Research Outcomes}
 Overall, this project was able to achieve its primary goal of evaluating and understanding the EMANE tool.
-Several scenarios were presented that EMANE was shown to be successful operating in.
+Several scenarios were presented that EMANE was shown to be successful at operating under.
 The first use-case of rural broadband testing, showed that the basic rfPipe radio model can be configured to match the characteristics of a hardware testbed.
-This scenario does carry the warning that just because the characteristics of the network were the same, not every model in EMANE is validated.
-The rfPipe model is simple enough that the throughput and latency being similar is enough to use it in basic testing, but advance models mimic more complex models that must be examined.
-The second use-case shows that EMANE provides an ideal environment for testing and developing networking software.
-Care must be taken when modeling test traffic, but EMANE provides many avenues for creating and using test data.
-The third use case shows that EMANE is able to work with other tools to create a more complete system, with the timescale differences identified as the major obstacle to be considered.
+This scenario does carry the warning that just because the characteristics of the network are the same, not every model in EMANE is validated.
+The rfPipe model is simple enough that the throughput and latency matching is enough to use it in basic testing, but advance models mimicking more complex behaviors must be tested further.
+The second use-case shows that EMANE provides a good environment for testing and developing networking software.
+Care must be taken when selecting and modeling test traffic, but EMANE provides many avenues for creating and using test data.
+The third use case shows that EMANE is able to work with other tools to create a more complete system, with the timescale differences between software types identified as the major obstacle to be considered.
 
 \section{Future Work}
     % Create more accurate and refined models for EMANE that can then be pluggable into testbeds
@@ -18,8 +18,8 @@ The third use case shows that EMANE is able to work with other tools to create a
     % Further integrations between ARGoS and EMANE to expand functionality and optimize time consumed
 While each stage of this thesis had successes, there are still several pieces of work that remain uncompleted. The following list outlines this future work:
 \begin{itemize}
-    \item Conducting extensive validation of the models included within EMANE. EMANE is not as widely used as many other network testing tools, and as such has been studied less for its validity. If more advanced models are to be used in EMANE, it should be ensured they are accurate enough for the advanced use cases.
-    \item Creating additional wireless models for EMANE. By default, EMANE only has radio models accessible, with one being the generic model used in this thesis and another being used for testing of EMANE itself. If EMANE is to be more widely used, it needs to be able to model more modern waveforms and technologies.
-    \item Additional testing and development of the intelligent router software. Due to the issues described in Chapter~\ref{chapter2} only one initial test was conducted with non-ideal conditions.
-    \item Further integration and optimizations between EMANE and ARGoS. Finding ways to reduce the time EMANE adds onto the total simulation, while also adding functionality to allow for modeling of more communication factors like latency or advanced routing techniques would allow the integration to be even more widely used.
+    \item Conducting extensive validation of the models included within EMANE. EMANE is not as widely used as many other network testing tools, and as such has been studied less regarding its validity. If more advanced models are to be used in EMANE, it should be ensured they are accurate enough for the advanced use cases.
+    \item Creating additional wireless models for EMANE. By default, EMANE only has four radio models accessible, with one being the generic model used in this thesis and another being used for testing of EMANE itself. If EMANE is to be more widely used, it needs to be able to model more modern waveforms and technologies.
+    \item Additional testing and development of the intelligent router software. Due to the issues described in Chapter~\ref{chapter2} only one initial test was conducted with non-ideal conditions. Further testing should be conducted to evaluate the tool in ideal conditions
+    \item Further integration and optimizations between EMANE and ARGoS. Finding ways to reduce the time EMANE adds onto the total simulation, while also adding functionality to allow for modeling of more communication factors like latency or advanced routing techniques would allow the integration to be even more useful.
 \end{itemize}

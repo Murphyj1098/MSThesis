@@ -1,25 +1,25 @@
 \chapter{Introduction}
 \label{ch:introduction}
 The need for wireless communications and network technology is rapidly growing.
-As more and more devices become network-enabled, the need for technology to support this rapid growth in wireless communication systems becomes apparent.
+As more and more devices become network-enabled, the need for technology to support this rapid growth becomes apparent.
 Despite this need for interconnectivity, there is still a large divide in the amount of people with access to broadband services.
 A study conducted in early 2021 found that rural broadband deployments are increasing, but rural communities still lag behind suburban and urban communities in terms of connectivity~\cite{digital_divide}.
 Additionally over the last 10 years, the number of U.S. adults that rely on the Internet has grown by 10\%~\cite{broadband_factsheet}.
 This heavy reliance on networks and the Internet is expected to continue, with experts estimating in the next 10 years, the number of IoT devices alone will triple from ten billion to thirty billion~\cite{iot_spread}.
 The demand for new wireless technologies and systems creates an issue with testing and deployment.
 Part of the reason rural communities lag behind is due to the difficulty in rapidly developing, deploying, and testing communication technology.
-To attempt to minimize this issue several tools have been created at allows for testing networks, besides hardware deployments that seek to lower the difficulty of testing.\par
+To attempt to minimize this issue several tools have been created that allow for testing networks, with the goal of lowering the difficulty of testing.\par
 
 Many software and combination software-hardware platforms exist for testing networks.
-Tools like ns-3, MATLAB, and GNURadio all provide different platforms that testing can be conducted.
-MATLAB is a good tool for doing signal processing, but simulating the behavior of networks is not a feasible use for it.
-ns-3 provides great support for network protocols, but abstracts are made at the physical layer that may call into question the validity of the tool in some use cases.\par
+Tools like ns-3, MATLAB, and GNURadio all provide different platforms for testing with different areas of focus.
+MATLAB is a good tool for doing signal processing and analysis, but has little support for real-time networking.
+ns-3 provides great support for network protocols, but abstractions are made at the physical layer that may call into question the results in many use cases.\par
 
 Despite several tools existing to test networks, the issue of cost, accessibility, and accuracy are still rampant.
 Many of the tools that have highly accurate models of the entire OSI model, from the physical layer through the transport layer, are very expensive and not attainable.
-NetSim and OPNET (now part of the Riverbed platform), provide enterprise grade modeling, but can cost hundreds of dollars to use.
-GNURadio allows for interactions with wireless communication hardware and software defined radios, but the hardware component is still an expensive cost looking to be avoided.
-Another issue with several of the existing tools is there complexity to set up.
+NetSim and OPNET (now part of the Riverbed platform), provide enterprise-grade modeling, but requires licensing to use.
+GNURadio allows for interactions with wireless communication hardware and software-defined radios, but the hardware component is still an expensive cost that needs to be avoided.
+Another issue with several of the existing tools is the complexity to set up.
 Many tools require extensive programming knowledge to be able to achieve the desired result, or do not provide an easy mechanism with which to analyze results.\par
 
 This thesis proposes several solutions to contribute to the field of network and communications testing:
