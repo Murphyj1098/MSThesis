@@ -1,10 +1,50 @@
 \chapter{Conclusion}
 \label{conclusion}
+\section{Evaluating Network Emulation}
+%% Critical discussion of limitations of emulating networks (as done in the thesis)
+This thesis began by proposing network emulation as a solution to the difficulties present in developing and testing communication networks.
+Chapter~\ref{chapter2} introduced several issues that often occur in network testing and development, including the expensive nature of hardware testbeds, the difficulties in creating an accurate enough testbed, and the time required to test multiple network topologies and configurations.
+The question now remains if emulation is able to address these issues, and the remainder of this section will attempt to answer this.\par
+% Limitations of emulation include:
+    % Performance problems (unstable performance, could help to explore a distributed approach to EMANE)
+        % Chapter 3 showed a 200Mbps throughput with EMANE, but was often unstable (during certain tests throughput would be real small)
+        % Distribution of nodes helps with compute limitations, but the emulation is then limited by the link connecting them all
+            % This could add expensives if something like 10 gig direct attach copper is required
+    % Difficulty of understanding the tool/availability of preconfigured tools
+Firstly, a few limitations with EMANE and network emulation concepts were discovered in testing that must be considered when determining if emulation is an appropriate tool.
+The first limitation relates to the performance of emulated networks.
+All the networks emulated in this thesis were able to match the expected network performance. This was primarily due to the careful configuration of the tool.
+Every design decision was made while considering the performance impacts they would cause, and even with these considerations, initial configurations had instability.
+These instabilities are caused by the computational load generated when all packets in a network have to be handled by a single kernel, a problem unique to emulation.
+The system was eventually made stable by ensuring enough computational resources were available for the task.
+Still, in bigger testbeds, a single server may not be sufficient, and a distributed approach to emulation may need to be considered.
+The other primary limitation found with emulation and EMANE was the initial difficulty with using the tool.
+Emulation was suggested as an easier alternative to other testing methods, and it still could be easier provided enough documentation and tutorials are created.
+The difficulty with understanding how to use EMANE was specifically attributed to the tool's small user base.
+As more researchers use the tool, it becomes easier to find help.
+The same can be said for the difficulty in using network simulation and networking hardware.
+Every tool will have an initial period of difficulty, especially if adequate documentation does not exist, and for this reason, the difficulties experienced with EMANE should not invalidate it.\par
+% Use specific experience from research to prove/disprove:
+    % Emulation lowers the difficulty of testing (especially in hardware)
+        % Learning the tool can be difficult 
+    % Emulation reduces costs
+        % EMANE free -- OVERCOME (Hardware) $>15000
+    % Allow for limited testing of hardware (without a whole hardware network)
+Despite these limitations, we still found emulation works as a good tool for testing networks.
+Emulation primarily lowers the cost of testing, especially when using an open-source tool like EMANE that costs nothing to use.
+For comparison, the hardware alone in the testbed built in Chapter~\ref{chapter3} cost over \$15,000 USD, excluding costs for labor or permits needed to deploy the network.
+This significant difference in cost is a strong argument for simulation and emulation.
+Another issue proposed was the difficulty in creating an accurate testbed.
+Our experiments showed that in addition to being flexible, EMANE is also able to model several factors of a communications network accurately.
+In addition to writing models that provide accuracy, hardware can be interfaced with the tool (as shown in Chapter~\ref{chapter4}) or other software tools can be integrated to provide accuracy for externally controlled factors (as seen in Chapter~\ref{chapter5}).
+This desire for an accurate representation of the physical channel provides emulation with an advantage over simulation, as being able to use hardware for specific segments can ensure perfect accuracy. 
+As long as the tool is used with care to ensure accuracy (as is the case with most testing tools), network emulation can provide an ideal testing environment for communication networks.
+
 \section{Research Outcomes}
 Overall, this project was able to achieve its primary goal of evaluating and understanding the EMANE tool.
 Several scenarios were presented that EMANE was shown to be successful at operating under.
 The first use-case of rural broadband testing, showed that the basic rfPipe radio model can be configured to match the characteristics of a hardware testbed.
-This scenario does carry the warning that just because the characteristics of the network are the same, not every model in EMANE is validated.
+This scenario does carry the warning that just because the characteristics of the network are the same, not every model in EMANE is validated, and care must be taken to ensure the emulator is configured right.
 The rfPipe model is simple enough that the throughput and latency matching is enough to use it in basic testing, but advance models mimicking more complex behaviors must be tested further.
 The second use-case shows that EMANE provides a good environment for testing and developing networking software.
 Care must be taken when selecting and modeling test traffic, but EMANE provides many avenues for creating and using test data.
