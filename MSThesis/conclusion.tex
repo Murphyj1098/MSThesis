@@ -42,7 +42,25 @@ As long as the tool is used with care to ensure accuracy (as is the case with mo
 
 \section{Limitations of Network Emulation}
 The previous section discussed a few limitations found with EMANE during testing.
-This section aims to provide a 
+This section aims to provide concluding thoughts on network emulation as a whole and some limitations and shortcomings discovered.\par
+One of the biggest issues with network emulation, is the aforementioned performance limitations.
+These limitations create issues with running large-scale testbeds, but more importantly can create inaccuracies in the results.
+The delay throughput of a channel are carefully configured, but these values do not take into account added delays caused by the kernel.
+Packets switching through the kernel are assumed to have a small enough delay and high enough throughput that they can be ignored.
+This behavior is acceptable for small testbeds that do not push the limits of the host machine, but in larger testbeds where the host machine is pushed to its limit, the impact of the kernel may affect results (especially in very high speed, low latency networks).
+This problem does not disappear when moving to a distributed layout.
+The distribution of work to other machines fixes the issue with the kernel being overloaded, but introduces the new issue of the connecting fabric between servers imparting its own communication behaviors.
+If two machines are directly attached, the issue is minimal, but if a network switch (or worse a router) is introduced, the latency increases.
+Sufficiently fast hardware connecting emulation hosts can be purchased, but this is an expense that raises the total cost of emulation testing. \par
+An additional limitation of network emulation is the amount of configuration available.
+High configurability is beneficial to some degree, but if too many attributes need to be set, it becomes more likely that data that is not readily available is required.
+Communication technologies that have been extensively studied, like the IEEE802.11 family, has plenty of data available to reference, but if the technology being emulated is new or less commonly used, a hardware testbed may be needed to simply configure the emulation testbed.
+At that point, the built hardware testbed could just be used for testing instead eliminating the need for emulation in the first place.\par
+The third major limitation to network emulation is the ability for randomness to affect results. 
+One of the flaws with hardware testbeds is the random nature of the operation environment, affecting results and making it more difficult to replicate issues.
+Network emulation reduces some amount of randomness present in the testbed, but the presence of real network packets (both being operated on and generated) creates some inherent randomness.
+If the host machine is running a process in the background unknown to the operator, this can create unexpected behavior as less resources are available to the emulator.
+All of these limitations must be considered when selecting network emulation as the testing method of choice, and with careful consideration the limitations can either be deemed irrelevant or can be accounted for.
 
 \section{Research Outcomes}
 Overall, this project was able to achieve its primary goal of evaluating and understanding the EMANE tool.
