@@ -1,27 +1,27 @@
 \chapter{Overview on Network Emulation}
 \label{chapter2}
-Before utilizing the EMANE tool and presenting several situations in we can use the tool, we must first understand why EMANE was selected and why network emulation is used over simulation or hardware testbeds in this thesis.
+Before utilizing the EMANE tool and presenting several situations in which we can use the tool, we must first understand why EMANE was selected and why network emulation is used over simulation or hardware testbeds in this thesis.
 After justifying the choices behind selecting EMANE, an in-depth tutorial on the tool's installation, configuration, and operation is presented.
 Finally, a brief overview of mobile ad-hoc network (MANET) routing is presented.
 These protocols are essential to understand as they are commonly used in EMANE to create routes between nodes.\par
 
 \section{Testing Communication Networks} % General information on network emulation and simulation and hardware testbeds
 There are typically three ways new network architectures, technologies, and protocols are developed and tested. These are network simulation, network emulation, and hardware testbeds~\cite{simulation_emulation}.
-As expected, each of the three methods has pros and cons.\par
+As expected, each of the three methods has pros and cons as shown in Table~\ref{simtable}.\par
     % Network Hardware
         % Expensive
         % Time consuming to deploy
         % Errors can be sporadic
 Hardware testbeds are the most accurate since they encompass the devices expected to be used in the network once development and testing are done.
-Hardware, however, is expensive to purchase, time-consuming to deploy, and often difficult to troubleshoot if errors do not consistently appear~\cite{nsclick}.
+However, hardware is expensive to purchase, time-consuming to deploy, and often difficult to troubleshoot if errors do not consistently appear~\cite{nsclick}.
 These factors make hardware testing not accessible to users that have a low budget.\par
     % Network Simulation
         % Mimic the behavior of a network
         % Uses mathematical models
         % Can run faster than real time
 Network simulation is one solution to testing that solves many issues with testing on hardware.
-Several free and open-source network simulators like ns-3~\cite{ns3} or OMNeT++~\cite{omnet++} are commonly used and provide a solution to the high hardware costs.
-Like most network simulators, these simulators operate on the concept that the behavior of a network and its components can be modeled via statistical and mathematical models.
+Several free and open-source network simulators such as ns-3~\cite{ns3} or OMNeT++~\cite{omnet++} are commonly used and provide a solution to the high hardware costs.
+Similar to most network simulators, these simulators operate on the concept that the behavior of a network and its components can be modeled via statistical and mathematical models.
 Creating models for network behavior allows simulators to run faster than real-time since the models do not need to wait for events to happen.
 However, the caveat is that simulation models must be highly accurate when developed, or results from the simulation will not match expected hardware behavior.
 Researchers creating new simulation models must ensure the models are validated against the expected hardware behavior to confirm the accuracy of the models before they can be used in testing~\cite{omnet_manager}.
@@ -31,9 +31,9 @@ Simulation also has the benefit of being highly repeatable since the behavior of
         % Allows integration with hardware
         % Potentially more overhead
 Network emulation exists somewhere between testing on hardware and testing inside a simulation.
-These emulators are still software that gets used to mirror the behavior of a testbed, like simulators.
+These emulators are still software that gets used to mirror the behavior of a testbed, such as simulators.
 However, emulators operate on actual network data instead of modeling the behavior of a network.
-Because emulation testbeds operate on actual network traffic, they also can interface with hardware.
+Since emulation testbeds operate on actual network traffic, they also can interface with hardware.
 This hardware-in-the-loop functionality allows hardware testing without the need to build an entire hardware network.
 This characteristic of operating on real network traffic also has the downside of introducing more computational overhead.
 The system emulating the network needs to manage all the test traffic as well as the effects and permutations that are imparted on the traffic.\par
@@ -57,37 +57,37 @@ The system emulating the network needs to manage all the test traffic as well as
 	\label{simtable}
 \end{table}
 
-Table~\ref{simtable} summarizes the pros and cons of different testing environments.
-
 \section{Evaluation of Network Testing Tools} % Why EMANE was selected over other tools
 During the initial research for this thesis, several network simulation and emulation tools were considered for use in this thesis.
 These programs all provide functionality that would achieve the goals of performing inexpensive and less time-consuming network testing but were eventually decided against in favor of EMANE.
 This section will highlight a few of these tools and explain the reasoning behind why they were not selected before finishing by introducing EMANE and explaining the driving reasons for its selection.\par
 
 % ns-2 and ns-3
-One of the most common tools, ns-3, is a discrete, event-based network simulation tool commonly used to simulate TCP/IP networks~\cite{ns3}.
+One of the most common tools, ns-3, is a discrete event-based network simulation tool commonly used to simulate TCP/IP networks~\cite{ns3}.
 It is the successor to the ns-2 tool~\cite{ns2}, with the two significant differences being how simulation scripts are written and executed in the simulator.
 In ns-3, the core simulator and experiment scripts are written in C++. ns-3 also provides Python bindings so smaller scripts can be written using Python instead.
 This makes ns-3 much simpler than ns-2, which required the use of Tcl scripts to create experiments~\cite{ns2_ns3}.
-The migration from ns-2's programming method to ns-3's makes the tool easier to use. However, it still requires a lot of programming knowledge to understand how to utilize the library of models provided.
+The migration from ns-2's programming method to ns-3's makes the tool easier to use.
+However, it still requires a significant amount of programming knowledge to understand how to utilize the library of models provided.
 Being one of the most commonly used tools, ns-3's library of simulation modules has been extensively validated, but these modules typically focus on the network layer and above.
 ns-3 can be used as an emulator; however, the motivation for the emulation mode in ns-3 was primarily driven by the ability to use ns-3 with hardware~\cite{ns3_orbit}.
-Since we would like to avoid wireless hardware equipment, this option for ns-3 is not valuable for the research present in this paper.
+Since we want to avoid wireless hardware equipment, this option for ns-3 is not valuable for the research present in this paper.
 The wide-scale use and extensive support of ns-3 made the tool a promising candidate, but it was decided against due to the abstractions made at the physical layer.\par
 
 % OMNeT++
-OMNeT++ is another discrete event simulator written in C++, like ns-3, however, it is not explicitly designed as a communications network simulator~\cite{omnet++}.
+OMNeT++ is another discrete event simulator written in C++, similar to ns-3.
+However, OMNeT++ it is not explicitly designed as a communications network simulator~\cite{omnet++}.
 Despite not being designed as a communications network simulator, the ability to create plugins for the tool has led to many researchers creating models of communication networks that can be used.
 The issue with this collection of plugins is that many users have found them to be highly incompatible with each other.
 This is likely due to the isolated nature many of the modules were developed under~\cite{tool_survey}.
 One of the advantages of OMNeT++ is that it supports a graphical user interface that allows for more accessible building of and interaction with network testbeds.
-Figure~\ref{omnet_gui} shows an example of this GUI, which is based on the Eclipse IDE.\par
+Figure~\ref{omnet_gui} shows an example of this GUI, which is based on the Eclipse IDE.
 Since OMNeT++ is not designed for communications networks specifically and many plugins are incompatible, it was decided not to be used.
 
 \begin{figure}[!ht]
     \centering
     \includegraphics[width=\textwidth,keepaspectratio]{Images/Chpt2/omnet_gui.png}
-    \caption{An example of the OMNeT++ Simulator GUI.}
+    \caption{An example of the OMNeT++ Simulator GUI (from~\cite{omnet++}).}
     \label{omnet_gui}
 \end{figure}
 
@@ -100,22 +100,23 @@ CORE also allows users to create virtual nodes via a Python framework, which is 
 Without any modification, CORE emulates the network layer and above perfectly, as each virtual node is running the actual, unmodified software that would be running on hardware \cite{emane_core}.
 Where CORE runs into issues is when wireless channels are introduced.
 By default, CORE operates on the concept that if nodes are close enough to communicate, they have a perfect connection, and if they are far enough apart by a certain distance, they can not communicate.
-This simplification is not acceptable for most testing requiring accurate wireless communication modeling. So to solve this issue, EMANE was integrated into CORE so that all physical and data link layer emulation happened through EMANE instead~\cite{emane_core}.
+This simplification is not acceptable for most testing requiring accurate wireless communication modeling. To solve this issue, EMANE was integrated into CORE so that all physical and data link layer emulation happened through EMANE instead~\cite{emane_core}.
 Figure~\ref{core_emane} shows the configuration menu for EMANE within CORE.
-With this pairing, CORE and EMANE become a very valuable tool, however in this thesis CORE is not used independently or alongside EMANE.
+With this pairing, CORE and EMANE become a very valuable tool.
+However, in this thesis CORE is not used independently or alongside EMANE.
 The main reasoning is that most protocols being used at the network layer or higher are not present in CORE, and computational complexity can be saved by running them in EMANE directly, without CORE.\par
 
 \begin{figure}[!ht]
     \centering
     \includegraphics[width=0.7\textwidth,keepaspectratio]{Images/Chpt2/core_gui.png}
-    \caption{An example of the CORE Emulator GUI.}
+    \caption{An example of the CORE Emulator GUI (from~\cite{core}).}
     \label{core_gui}
 \end{figure}
 
 \begin{figure}[!ht]
     \centering
     \includegraphics[width=0.7\textwidth,keepaspectratio]{Images/Chpt2/core_emane.png}
-    \caption{The configuration menu for EMANE, within CORE. From~\cite{emane_core}.}
+    \caption{The configuration menu for EMANE, within CORE (from~\cite{emane_core}).}
     \label{core_emane}
 \end{figure}
 
@@ -124,7 +125,7 @@ EMANE is a network emulation tool originally developed by the Naval Research Lab
 The tool is a discrete event-driven emulator programmed in C++ and Python, and is configured by the user primarily through XML files and Bash scripts.
 The software was developed with the intention of creating a platform that could emulate the physical and data link layers of the OSI network model with high accuracy, therefore avoiding many of the abstractions made by other tools.
 EMANE consists of several subsystems and components required to create a fully functional testbed, and this complexity can lead to an initial steep learning curve with the tool.
-The tool is open-source, however, the online community around EMANE is rather small and most of the discussion and troubleshooting surrounding the tool is only found on EMANE's GitHub issues page, not helping solve the initial complexity issue.
+However, given that the tool is open-source, the online community around EMANE is rather small and most of the discussion and troubleshooting surrounding the tool is only found on EMANE's GitHub issues page, not helping solve the initial complexity issue.
 Despite all this, once the user forms a solid understanding of the tools and systems within the software, it can be used to effectively and quickly create wireless networks.
 EMANE's ability to be configured through XML files makes deployment of networks very rapid, and because the included models are pluggable, these configuration files can be reused in other networks using the same wireless technology.
 For these reasons and the reasons highlighted previously regarding other testing tools, EMANE was selected as the tool of choice for this thesis.
@@ -173,7 +174,7 @@ See Appendix~\ref{appendixa} for a list of the specific commands used to complet
     \item The first step is downloading the precompiled binaries. As seen in Figure~\ref{wget_emane}, the \textit{wget} utility is used to download the compressed file, but any method for retrieving this file can be used. This compressed file should be extracted before the next step.
     \item To install the downloaded binaries, the \textit{dpkg} application is used. Errors will be reported upon installation, as not all the dependencies are installed. This will be fixed after the initial installation via \textit{apt}. Figure~\ref{install_emane} shows the initial installation finishing with errors, and the command used to fix these errors.
     \item Lastly, we can verify that EMANE was installed correctly by having the program output its version. Figure~\ref{check_emane} shows that EMANE version 1.3.3 was successfully installed.
-    \item Once installation of EMANE has been verified, additional support software (like testing tools and routing protocols) can be installed to use with EMANE. Appendix~\ref{appendixa} shows some examples of installing certain tools.
+    \item Once installation of EMANE has been verified, additional support software (such as testing tools and routing protocols) can be installed to use with EMANE. Appendix~\ref{appendixa} shows some examples of installing certain tools.
 \end{enumerate}
 
 \begin{figure}[!ht]
@@ -208,7 +209,7 @@ Now that EMANE is installed, it is important to understand the major systems tha
 The main structure in EMANE that everything operates around is known as the Network Emulation Module (NEM).
 Each NEM can be thought of as a single network node, similar to a singular radio.
 As each NEM is an independent network node, every NEM created requires network stack isolation within the kernel of the host system.
-All the traffic flowing through the emulation testbed consists of real IP packets and are therefore treated like regular network traffic by the kernel.
+All the traffic flowing through the emulation testbed consists of real IP packets and are therefore treated in the same way as regular network traffic by the kernel.
 If the network stacks were not isolated, packets would not route through the emulator and would instead just be switched between processes in the kernel, bypassing all wireless channel effects.\par
 There are several methods than can be used to create network stack isolation.
 Full virtual machines could be used, but these are very computationally inefficient and would not allow the emulated testbed to maintain a large number of nodes.
@@ -219,7 +220,7 @@ Between FreeBSD jails, Linux OpenVZ containers, and Linux namespaces containers,
 For most examples of EMANE and all the testbeds created in this thesis, Linux Containers (LXCs) are used.
 These are lightweight containers that are built on top of Linux namespaces and allow for the sharing of files and other resources, while keeping processes and the network stack isolated.\par
 
-Figure~\ref{emane_diagram} shows what a typical EMANE emulation node will look like, with one of these structures existing per LXC.
+Figure~\ref{emane_diagram} shows how a typical EMANE emulation node appears, with one of these structures existing per LXC.
 In this diagram, the NEM is visible, with all of its surrounding subsystems and connections.
 The blue boxes within the NEM are the emulation models that are responsible for imparting wireless channel effects on packets moving upstream and downstream through the emulator.
 The green boxes represent the transport boundary. This is the edge of the emulation node where packets leave the emulator and return to normal application space.
@@ -238,7 +239,7 @@ These three systems are the major subsystems that make up EMANE and allow it to 
 The emulation model processing is the system primarily responsible for modifying packets traveling through the NEM to mimic the behavior of a wireless signal.
 This system in EMANE consists of two main parts, the Physical Layer Plugin and the Radio Model Plugin, both of which can be seen in blue in Figure~\ref{emane_diagram}.
 As the names of the plugins imply, the Physical Layer plugin is responsible for imparting the effects of the physical layer, and the Radio model plugin is responsible for the MAC Layer.
-The Over the Air Channel Manager is primarily responsible for pulling packets addressed to the NEM off of the shared bus, and putting packets ready to be transmitted onto the shared channel.
+The Over the Air (OTA) Channel Manager is primarily responsible for pulling packets addressed to the NEM off of the shared bus, and putting packets ready to be transmitted onto the shared channel.
 This shared OTA channel simply takes the form of a virtual interface bridge that all NEMs are attached to, creating a bus topology.
 The NEMs use a multicast scheme to listen for packets as other control channels also use this interface bridge to communicate.
 It is the main backbone of the emulation that connects all the individual network nodes, both for control messages, but also data payloads.\par
@@ -246,12 +247,12 @@ It is the main backbone of the emulation that connects all the individual networ
         % Pathloss, fading, noise, pulling packets of OTA channel, power calculations
 As previously mentioned, the shared PHY plugin is responsible for the effects of the physical layer.
 It is possible to create a custom Physical Layer model, but is usually not necessary and only one PHY model is included in EMANE by default.
-This model is responsible for attributes like pathloss and signal propagation, fading, noise modeling, and the antenna profile.\par
+This model is responsible for attributes such as path loss and signal propagation, fading, noise modeling, and the antenna profile.\par
 The first parameter to be set is the propagation model.
-This model is responsible for calculating the expected pathloss between two nodes, and has three options.
+This model is responsible for calculating the expected path loss between two nodes, and has three options.
 The first two options are \textit{freespace} and \textit{2ray}.
-These use location data contained within the node and the freespace or 2-ray flat earth model to calculate the pathloss of a channel.
-The third option is called \textit{precomputed} and is used when the pathloss is to be calculated external to the emulator.
+These use location data contained within the node and the freespace or 2-ray flat earth model to calculate the path loss of a channel.
+The third option is called \textit{precomputed} and is used when the path loss is to be calculated external to the emulator.
 This is useful if a more complex model is to be used, or a different tool is being used to model signal propagation.\par
 The second configuration step is related to the power characteristics of the node and its virtual antenna.
 Transmit power can be set, and serves the same purpose it would on a hardware radio.
@@ -279,11 +280,11 @@ The final piece of the PHY model that must be understood is noise modeling.
 EMANE models noise by taking the transmission power of any NEM actively transmitting, and adding it to the noise floor of any receiving node if that receiver's set frequency is within the bandwidth of the interfering signal.
 This results in all interfering signals being treated as white noise~\cite{emane_phy}.
 EMANE provides parameters to set if the noise mode is for all signals within the correct frequency, just signals that are out-of-band, or turning off noise processing completely.
-Once all of these factors are set, EMANE can then use the following two equations to determine if a packet can actually be received.
-If the received power (\textit{rxPower}) is greater than the receiver's sensitivity (\textit{rxSensitivity}), the packet is received.
+Once all of these factors are set, EMANE can then use the following two equations to determine if a packet can actually be received:
 \[ rxPower = txPower + txAntennaGain + rxAntennaGain - pathloss \]
 \[ rxSensitivity = -174 + noiseFigure + 10log(bandwidth) \]
-Figure~\ref{emane_phy} shows what a general Physical Layer Plugin configuration file will look like.\par
+If the received power (\textit{rxPower}) is greater than the receiver's sensitivity (\textit{rxSensitivity}), the packet is received.
+Figure~\ref{emane_phy} shows how a general Physical Layer Plugin configuration file appears.\par
 
 \begin{figure}[!ht]
     \centering
@@ -303,7 +304,7 @@ EMANE ships with four Radio plugins:
     \item TDMA - A generic time division multiple access scheme
     \item Bypass - A model specifically for testing that passes traffic along to the next layer unchanged
 \end{itemize}
-Other plugins can be created by extending the emulator, and a plugin designed for LTE and 5G is currently under development in collaboration with the srsRAN project.\par
+Other plugins can be created by extending the emulator, and a plugin designed for LTE and 5G is currently under development in collaboration with the srsRAN project~\cite{srsran,srsran-emane}.\par
 These four plugins all operate differently, but for the purposes of this thesis only the rfPipe model will be used.
 The goal of rfPipe is to create a simple model that handles data rate, delay, jitter, and probability of packet loss due to signal to interference and noise ratio (SINR).
 The data rate, delay, and jitter are all simple parameters that get set and are implemented by holding packets at the radio model layer long enough to achieve the set values.
@@ -321,8 +322,8 @@ One of the essential pieces of the emulation processing system is ensuring the m
 While several studies use the rfPipe model \cite{rfPipe1, rfPipe2, rfPipe3}, very little literature could be found validating the models included within EMANE.
 The rfPipe model is generic enough that there are no modulation schemes or other access functions that need to be validated, but the implementation of the behavior must still be checked.
 Similarly, the calculations performed at the Physical Layer are fairly simple, but must also be validated.
-A validation like the one found for the TDMA model \cite{emane_tdma}, should be performed for all models presently in EMANE, as well as for any custom models created.
-For the purposes of this thesis, EMANE is being used to test parameters like throughput and latency which can be easily compared to hardware equivalent testbeds.
+A validation similar to the one found for the time-divison multiple access (TDMA) model \cite{emane_tdma}, should be performed for all models presently in EMANE, as well as for any custom models created.
+For the purposes of this thesis, EMANE is being used to test parameters such as throughput and latency which can be easily compared to hardware equivalent testbeds.
 Chapter~\ref{chapter3} will examine this to make comparisons between the two, however, if EMANE is to be used in more advanced testbeds with highly complex models, validation is essential.
 
 \subsection{Transport Boundary Processing}
@@ -330,7 +331,7 @@ Chapter~\ref{chapter3} will examine this to make comparisons between the two, ho
 The second system required to operate EMANE is the transport boundary.
 The transport boundary is represented in Figure~\ref{emane_diagram} by the green boxes, and is responsible for handing packets entering and exiting the emulator.
 Since EMANE is capable on operating on actual TCP/IP packets, one of the main roles of the transport boundary is to translate TCP/IP packets entering the emulator into something EMANE can operate on, and translate EMANE's packet back into TCP/IP packets.
-There are two types of transports that can be used with EMANE, raw transports and virtual transports.\par
+There are two types of transports that can be used with EMANE: raw transports and virtual transports.\par
     % Raw transport
         % Use physical network device as edge of emulation
         % Allows for "black-box" style testing
@@ -377,21 +378,21 @@ Figure~\ref{emane_virtual_transport} shows an example layout of the virtual netw
                 % Python modules
 Event processing is the system in EMANE that allows parameters of the simulator to change during runtime.
 There are five main event types.
-The first type, pathloss, is used when the propagation model is set to \textit{precomputed} and allows an external tool to make pathloss calculations.
-The second type, location, is used to move nodes around and primarily influences pathloss values that are calculated internally to the tool when using \textit{freespace} or \textit{2ray} settings.
+The first type, ``pathloss'', is used when the propagation model is set to \textit{precomputed} and allows an external tool to make path loss calculations.
+The second type, ``location'', is used to move nodes around and primarily influences path loss values that are calculated internally to the tool when using \textit{freespace} or \textit{2ray} settings.
 The location event can take latitude, longitude, altitude, pitch, yaw, roll, and velocity data for a node.
-The third event type is the antenna profile event.
+The third event type is the ``antenna profile'' event.
 Similar to the antenna profile setting in the Physical Layer plugin, this event can be used to feed antenna data to a node, and change that data during runtime.
 The fourth event is used to change the fading model being used.
 This event is fairly simple and is used to toggle whether a node uses the Nakagami fading model or no fading model.
-The final event is called Comm Effect, and is used to change generic communication parameters of a node, such as the latency, jitter, or probability of packet loss and duplication.\par
+The final event is called ``Comm Effect'', and is used to change generic communication parameters of a node, such as the latency, jitter, or probability of packet loss and duplication.\par
     % Scripted before runtime
         % EEL file(s)
     % Sent during runtime
             % Python modules
 There are two primary methods by which events get generated for distribution to nodes.
 The first is using an EEL file.
-This file is a specific EMANE file that is taken in at the start of emulation and contains "sentences" that outline event parameters and what time during the simulation they should begin.
+This file is a specific EMANE file that is taken in at the start of emulation and contains ``sentences'' that outline event parameters and what time during the simulation they should begin.
 Figure~\ref{emane_event} shows an example of an EEL file and the sentences contained within.
 The first value is the time the event is scheduled to fire, in this case all of these events fire at the start of emulation.
 The second value is the ID of the NEM the event is destined for, and this is followed by the event name and any corresponding parameters for that event type.
@@ -410,7 +411,7 @@ By putting both of these channels on the same bridge, the complexity of managing
     % What is important in routing in a ad-hoc mobile network rather than a traditional network
     % What routing algorithms exist in literature
         % Reactive vs. Proactive
-EMANE was designed originally to work with mobile ad-hoc networks, also known as MANETs.
+EMANE was designed originally to work with mobile ad-hoc networks (MANETs).
 While emulating other network types is possible, MANET routing protocols work well with EMANE's architecture and are often used.
 This special classification of network is characterized by its dynamic topology that often rapidly changes due to the mobility of network nodes and the tendency for the wireless links to intermittently connect and disconnect~\cite{manet_storm}.
 This lack of a fixed topology means that any node that exists in the network must be able to communicate without help from centralized infrastructure or a gateway and therefore must be able to independently make routing decisions. 
@@ -463,7 +464,7 @@ This has the benefit of making topological changes that occur on the opposite si
 \subsection{Reactive Routing}
     % Does not require maintenance and therefore generates less traffic
     % Topology updates are only discovered when a previously discovered route fails
-The other primary category of MANET routing protocol are reactive protocols, also sometimes referred to as "on-demand" protocols~\cite{manet_survey}.
+The other primary category of MANET routing protocol are reactive protocols, also sometimes referred to as ``on-demand'' protocols~\cite{manet_survey}.
 These protocols are referred to as on-demand protocols because routes to a destination are only found when the transmitting node requires them.
 This has the benefit of greatly reducing control traffic present in the network since topology and link state information is not periodically shared, but it does result in higher latency as traffic must wait for a route to be found.
 This type of routing protocol could be beneficial in a network that is constrained on bandwidth and will typically only contain traffic that is not time-sensitive.\par
@@ -478,7 +479,7 @@ At that point the discovery process is repeated to find a new route.\par
     % BATMAN tends to have less available bandwidth than AODV, but more reliably delivers packets and detects topology changes faster
 Generally, reactive protocols are found to not be as effective in highly mobile MANETs \cite{aodv_batman,reactive_routing}.
 B.A.T.M.A.N. is found to have less maximum available bandwidth in some situations when compared to AODV, but will more reliably deliver packets successfully, and often is able to react to changes in the graph faster.
-For this reason, proactive protocols like OLSR and B.A.T.M.A.N. are more commonly used in simple EMANE testbeds, as seen in the tutorial~\cite{emane_tutorial}.\par
+For this reason, proactive protocols such as OLSR and B.A.T.M.A.N. are more commonly used in simple EMANE testbeds, as seen in the tutorial~\cite{emane_tutorial}.\par
 All the testbeds in the remainder of this thesis will use the batman-adv implementation of the B.A.T.M.A.N. protocol.
 This implementation is built into the Linux kernel and installation instructions for using it can be found in Appendix~\ref{appendixa}.
 

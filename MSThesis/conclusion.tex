@@ -1,6 +1,6 @@
 \chapter{Conclusion}
 \label{conclusion}
-\section{Evaluating Network Emulation}
+\section{Evaluating EMANE and Network Emulation}
 %% Critical discussion of limitations of emulating networks (as done in the thesis)
 This thesis began by proposing network emulation as a solution to the difficulties present in developing and testing communication networks.
 Chapter~\ref{chapter2} introduced several issues that often occur in network testing and development, including the expensive nature of hardware testbeds, the difficulties in creating an accurate enough testbed, and the time required to test multiple network topologies and configurations.
@@ -11,13 +11,13 @@ The question now remains if emulation is able to address these issues, and the r
         % Distribution of nodes helps with compute limitations, but the emulation is then limited by the link connecting them all
             % This could add expensives if something like 10 gig direct attach copper is required
     % Difficulty of understanding the tool/availability of preconfigured tools
-Firstly, a few limitations with EMANE and network emulation concepts were discovered in testing that must be considered when determining if emulation is an appropriate tool.
+A few limitations with EMANE were discovered in testing that must be considered when determining if EMANE is an appropriate tool.
 The first limitation relates to the performance of emulated networks.
 All the networks emulated in this thesis were able to match the expected network performance. This was primarily due to the careful configuration of the tool.
 Every design decision was made while considering the performance impacts they would cause, and even with these considerations, initial configurations had instability.
 These instabilities are caused by the computational load generated when all packets in a network have to be handled by a single kernel, a problem unique to emulation.
 The system was eventually made stable by ensuring enough computational resources were available for the task.
-Still, in bigger testbeds, a single server may not be sufficient, and a distributed approach to emulation may need to be considered.
+Nevertheless, in larger testbeds, a single server may not be sufficient, and a distributed approach to emulation may need to be considered.
 The other primary limitation found with emulation and EMANE was the initial difficulty with using the tool.
 Emulation was suggested as an easier alternative to other testing methods, and it still could be easier provided enough documentation and tutorials are created.
 The difficulty with understanding how to use EMANE was specifically attributed to the tool's small user base.
@@ -40,9 +40,13 @@ In addition to writing models that provide accuracy, hardware can be interfaced 
 This desire for an accurate representation of the physical channel provides emulation with an advantage over simulation, as being able to use hardware for specific segments can ensure perfect accuracy. 
 As long as the tool is used with care to ensure accuracy (as is the case with most testing tools), network emulation can provide an ideal testing environment for communication networks.
 
+\section{Limitations of Network Emulation}
+The previous section discussed a few limitations found with EMANE during testing.
+This section aims to provide a 
+
 \section{Research Outcomes}
 Overall, this project was able to achieve its primary goal of evaluating and understanding the EMANE tool.
-Several scenarios were presented that EMANE was shown to be successful at operating under.
+Several scenarios were presented where EMANE was shown to be successful.
 The first use-case of rural broadband testing, showed that the basic rfPipe radio model can be configured to match the characteristics of a hardware testbed.
 This scenario does carry the warning that just because the characteristics of the network are the same, not every model in EMANE is validated, and care must be taken to ensure the emulator is configured right.
 The rfPipe model is simple enough that the throughput and latency matching is enough to use it in basic testing, but advance models mimicking more complex behaviors must be tested further.

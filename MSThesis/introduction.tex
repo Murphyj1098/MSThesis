@@ -1,38 +1,38 @@
 \chapter{Introduction}
 \label{ch:introduction}
 The need for wireless communications and network technology is rapidly growing.
-As more and more devices become network-enabled, the need for technology to support this rapid growth becomes apparent.
+As an increasing number of devices become network-enabled, the need for technology to support this rapid growth becomes apparent.
 Despite this need for interconnectivity, there is still a large divide in the amount of people with access to broadband services.
 A study conducted in early 2021 found that rural broadband deployments are increasing, but rural communities still lag behind suburban and urban communities in terms of connectivity~\cite{digital_divide}.
-Additionally over the last 10 years, the number of U.S. adults that rely on the Internet has grown by 10\%~\cite{broadband_factsheet}.
-This heavy reliance on networks and the Internet is expected to continue, with experts estimating in the next 10 years, the number of IoT devices alone will triple from ten billion to thirty billion~\cite{iot_spread}.
+Additionally over the last 10 years, the number of adults in the U.S. that rely on the Internet has grown by 10\%~\cite{broadband_factsheet}.
+This heavy reliance on networks and the Internet is expected to continue, with experts estimating in the next 10 years, the number of Internet of things (IoT) devices alone will triple from ten billion to thirty billion~\cite{iot_spread}.
 The demand for new wireless technologies and systems creates issues with testing and deployment.
 Part of the reason rural communities lag behind is due to the difficulty in rapidly developing, deploying, and testing communication technology.
 To attempt to minimize this issue several tools have been created that allow for testing networks, with the goal of lowering the difficulty of testing.\par
 
 Many software and combination software-hardware platforms exist for testing networks.
-Tools like ns-3, MATLAB, and GNURadio all provide different platforms for testing with different areas of focus.
+Tools such as ns-3~\cite{ns3}, MATLAB\cite{matlab}, and GNURadio\cite{gnuradio} all provide different platforms for testing with different areas of focus.
 MATLAB is a good tool for doing signal processing and analysis, but has little support for real-time networking.
 ns-3 provides great support for network protocols, but abstractions are made at the physical layer that may call into question the results in many use cases.\par
 
 Despite several tools existing to test networks, the issue of cost, accessibility, and accuracy are still rampant.
 Many of the tools that have highly accurate models of the entire OSI model, from the physical layer through the transport layer, are very expensive and not attainable.
-NetSim and OPNET (now part of the Riverbed platform), provide enterprise-grade modeling, but requires licensing to use.
+NetSim~\cite{netsim} and OPNET~\cite{opnet} (now part of the Riverbed platform), provide enterprise-grade modeling, but requires licensing to use.
 GNURadio allows for interactions with wireless communication hardware and software-defined radios, but the hardware component is still an expensive cost that needs to be avoided.
 Another issue with several of the existing tools is the complexity to set up.
 Many tools require extensive programming knowledge to be able to achieve the desired result, or do not provide an easy mechanism with which to analyze results.\par
 
 This thesis proposes several solutions to contribute to the field of network and communications testing:
 \begin{itemize}
-    \item The Extendable Mobile Ad-hoc Network Emulator (EMANE) is proposed as a valuable testing tool that addresses issues with other similar networking simulation tools. An overview of installing and using the tool is provided.
+    \item The Extendable Mobile Ad-hoc Network Emulator (EMANE)~\cite{emane_nrl} is proposed as a valuable testing tool that addresses issues with other similar networking simulation tools. An overview of installing and using the tool is provided.
     \item An initial program designed to maximize bandwidth usage in a constrained wireless network is developed. This is used as an example of how EMANE can be used as a network software development environment.
     \item Basic integration between EMANE and the robot swarm simulator ARGoS is created. EMANE is shown to be capable of extending and enhancing other tools to provide accurate communication emulation when required.
 \end{itemize}\par
 
 The remainder of this thesis is organized as follows:
-Chapter 2 presents an overview of the network emulator EMANE and the motivation behind the selection of this tool. An overview of the how to use EMANE and its subsystems is presented.
+Chapter~2 presents an overview of the network emulator EMANE and the motivation behind the selection of this tool. An overview of the how to use EMANE and its subsystems is presented.
 Three different use-cases for the EMANE tool are considered to evaluate the effectiveness of the tool.
-Chapter 3 proposes the first use case for testing with EMANE, testing rural broadband deployments. Two similar network topologies are proposed and tested with the help of EMANE.
-Chapter 4 explores a second use case for utilizing EMANE, development of networking technologies and systems. In this case a program for more intelligent allocated limited bandwidth is developed.
-Chapter 5 finally details a third use case for EMANE, integrating with other simulation tools to provide more accurate communication models.
-The paper is concluded with a summary of work completed and recommendations for future work in Chapter 6.
+Chapter~3 proposes the first use case for testing with EMANE, testing rural broadband deployments. Two similar network topologies are proposed and tested with the help of EMANE.
+Chapter~4 explores a second use case for utilizing EMANE, development of networking technologies and systems. In this case a program for more intelligent allocated limited bandwidth is developed.
+Chapter~5 finally details a third use case for EMANE, integrating with other simulation tools to provide more accurate communication models.
+The thesis is concluded with a summary of work completed and recommendations for future work in Chapter~6.

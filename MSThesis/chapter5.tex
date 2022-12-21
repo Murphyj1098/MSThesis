@@ -57,8 +57,8 @@ There are several reasons why it is beneficial to integrate the two tools.
 For one, EMANE on its own does not handle the mobility of nodes, the traffic that travels the network, or the management of an environment.
 These are all things that must be set up externally, and as such having ARGoS handle them is a natural fit.
 In the other direction, having EMANE handle communication for ARGoS can allow more accurate modeling of channel effects.
-ARGoS has basic "medium" plugins (the type of plugin responsible for communications), but these can be rather simple.
-One such model, simply determines if two robots are within a set range, and have line of sight.
+ARGoS has basic ``medium'' plugins (the type of plugin responsible for communications), but these can be rather simple.
+One such model, simply determines if two robots are within a set range, and have line of sight (LOS).
 If these conditions are true then the two robots are free to exchange information with no delay or maximum datarate.
 Another benefit to using EMANE is the ability to use the native implementation of the B.A.T.M.A.N. routing protocol.
 By deploying this protocol on EMANE, it can be further tested and developed in a proper swarm environment.
@@ -166,7 +166,7 @@ Once it finished the period, it updated the relevant information across the shar
 The EMANE interface script woke up and updated its internal store of information.
 Any new location data was sent into the emulator via location events so that the corresponding NEMs would move into the appropriate location and update their communication links.
 EMANE then began the process of emulating communications.
-This was done by measuring the throughput to adjacent nodes, instead of performing actual data transfers. The reasoning for this is explained in the following section.
+This was done by measuring the throughput to adjacent nodes, instead of performing actual data transfers. The reasoning for this is explained in the following section.\par
 Once EMANE collected all the required information from its throughput tests, it populated that information back into the shared memory blocks and woke ARGoS, starting the process over again.
 This then continued until ARGoS finished its current experiment, at which point it either reset, or terminated.
 In the case of termination, ARGoS signals EMANE to also shutdown.
@@ -205,16 +205,16 @@ ARGoS, and the algorithm running on the robots, was not concerned with any form 
 This means that EMANE did not need to worry about what data successfully made it to the receiver, just how much of it arrived.
 By avoiding handing off the entire data payload to EMANE, time could be saved and a layer of complexity was removed.
 EMANE instead can just characterize the transmission, and inform ARGoS on what amounts of data can be given to each robot in a certain timeframe.
-This does not compromise the validity of the channel effects EMANE imparts on transmission, as throughput and latency were the primary two metrics being modeled anyway (as witnessed in Chapter~\ref{chapter3}).\par
+This does not compromise the validity of the channel effects EMANE imparts on transmission, as throughput and latency were the primary two metrics being modeled anyway (as observed in Chapter~\ref{chapter3}).\par
 	% Issues with C vs Python programming languages (typing and shared memory)
 One of the major issues during development that had to be addressed was the difference in programming languages used.
 ARGoS, and therefore its portion of the interface code, was written in C++.
 The EMANE interface manager, was written in Python.
 Since data was being accessed directly from memory, it was important that the exact size of the data was accurately read.
 C++ provides the user with data types that are not present in Python, with most data types in Python taking up larger amounts of space than the closest equivalent in C/C++.
-Even when using a library like \textit{ctypes}, meant to introduce more "C-like" types, the problem was still present.
-The solution ended up being to serialize and deserialize the data instead of mapping the memory directly to a structure, like was done in C++.
-The following code snippet uses a format string to interpret the exact number of bytes each variable should be for serialization and serialization
+Even when using a library such as \textit{ctypes}, meant to introduce more ``C-like'' types, the problem was still present.
+The solution ended up being to serialize and deserialize the data instead of mapping the memory directly to a structure, as was done in C++.
+The following code snippet uses a format string to interpret the exact number of bytes each variable should be for serialization and serialization:
 \begin{minted}[fontsize=\footnotesize, breaklines]{python}
 __struct_format: str = 'HHdIIddd'
 
@@ -228,10 +228,10 @@ Further testing can be performed to determine if the interface script would have
 \section{Integration Results}
 	% EMANE and ARGoS are capable of working together
 		% Demonstrate ARGoS moving EMANE nodes
-The basic ability for ARGoS and EMANE to pass information back and forth is present, with ARGoS delivering robot locations and EMANE delivering communications metrics, but several factors remain to be implemented or improved upon.
+The basic ability for ARGoS and EMANE to pass information back and forth is presented, with ARGoS delivering robot locations and EMANE delivering communications metrics, but several factors remain to be implemented or improved upon.
 Figure~\ref{emane_locs} shows a printout of EMANE's event channel.
-By using the \textit{emaneevent-dump} utility, any events sent through EMANE can be seen.
-As witnessed in Figure~\ref{emane_locs}, EMANE received location events over time as ARGoS updated the manager script with new locations.
+By using the \textit{emaneevent-dump} utility, any events sent through EMANE can be observed.
+As observed in Figure~\ref{emane_locs}, EMANE received location events over time as ARGoS updated the manager script with new locations.
 \begin{figure}[!ht]
     \centering
     \includegraphics[width=0.85\textwidth,keepaspectratio]{Images/Chpt5/ARGoS_Events_EMANE_annotated.png}
@@ -243,7 +243,7 @@ Since these events should be firing for every 100ms of simulation time, we see t
 This behavior was expected from the start, but the extent of how bad it would be had been unknown.\par
 EMANE runs in real-time and therefore at a minimum would take 100ms to create 100ms of data.
 However, because the network needs time to reconfigure after locations are updated, and the throughput tests need time to record data, it is much more likely that EMANE takes anywhere from two to five times as long to generate that data.
-The ten times longer observed above is on the extreme side and was recorded before optimizations were started, however additional optimizations would be needed to bring that number down further, if possible.
+The extended run-time above is on the extreme side and was recorded before optimizations were started, but additional optimizations would be needed to bring that number down further, if possible.
 As a final point to understand the extent of the slowdown imparted on ARGoS by combining it with a real-time emulator, ARGoS running in isolation using an internal communication medium plugin only takes about four seconds to run a 10-minute experiment.
 With the best case scenario of EMANE adding 200ms of time per 100ms emulation block, the ten-minute experiment would now take twenty minutes.
 This length of emulation may be an acceptable trade off for the features EMANE brings to the testbed, but is an essential consideration that must be made.
